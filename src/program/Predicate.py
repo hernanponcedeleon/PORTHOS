@@ -1,4 +1,5 @@
 from z3 import And, Or, Not
+from types import NoneType
 
 numOperations = ["+", "-", "*", "/", "%", "xor"]
 numComparisons = ["==", "!=", "<", "<=", ">", ">=",]

@@ -1,8 +1,9 @@
 from Predicate import *
+from types import NoneType
 
 ### Expression := Int | Location | Register | Expression Op Expression.
 class Expression(Predicate):
-    
+
     def __init__(self, v1, op=None, v2=None):
         assert(isinstance(v1, (int, Expression)))
         assert(isinstance(v2, (int, Expression, NoneType)))
@@ -11,11 +12,11 @@ class Expression(Predicate):
         self.op = op
         self.v1 = v1
         self.v2 = v2
-    
+
     def __str__(self):
         if self.op == None: return str(self.v1)
         else: return "(%s %s %s)" % (str(self.v1), self.op, str(self.v2))
-    
+
     def encode(self, mapping):
         """ Returns a constraint representing the expression and renaming the variables to satisfy SA. """
         ### The mapping is used for the renaming

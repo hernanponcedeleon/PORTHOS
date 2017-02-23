@@ -1,3 +1,10 @@
+from Program import *
+from itertools import product
+
+def intVar(name, e): return Int('%s(%s)' %(name, ev(e)))
+
+def intCount(rel, e1, e2): return Int('%s(%s,%s)' %(rel, ev(e1), ev(e2)))
+
 def satFencesCAV(events):
     enc = True
     
