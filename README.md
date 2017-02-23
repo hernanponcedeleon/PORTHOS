@@ -22,11 +22,11 @@ The .pts format:
 ======
 
 ```
-  program ::= {⟨loc*⟩} ⟨thrd*⟩
+  program ::= {⟨loc⟩*} ⟨thrd⟩*
 
   ⟨thrd⟩ ::= thread String {⟨inst⟩}
 
-  ⟨inst⟩ ::= ⟨com⟩ | ⟨inst⟩; ⟨inst⟩ | while ⟨pred⟩ ⟨inst⟩ | if ⟨pred⟩ ⟨inst⟩ else ⟨inst⟩
+  ⟨inst⟩ ::= ⟨com⟩ | ⟨inst⟩; ⟨inst⟩ | while ⟨pred⟩ {⟨inst⟩} | if ⟨pred⟩ {⟨inst⟩} else {⟨inst⟩}
 
   ⟨com⟩ ::= ⟨reg⟩ <- ⟨expr⟩ | ⟨reg⟩ <- ⟨loc⟩ | ⟨loc⟩ = ⟨reg⟩ | ⟨fence⟩
   
