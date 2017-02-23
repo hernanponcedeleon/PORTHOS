@@ -1,5 +1,7 @@
 # PORTHOS: A tool to compare the behavior of programs against different memory models
 
+![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos.jpg)
+
 Usage:
 
 ```
