@@ -1,5 +1,6 @@
 from Program import *
 from itertools import product
+from Encoding import satUnion
 
 def intVar(name, e): return Int('%s(%s)' %(name, ev(e)))
 
