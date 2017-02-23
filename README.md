@@ -30,7 +30,19 @@ The .pts format:
   
   ⟨fence⟩ ::= hfence | lfence | cfence
   
-  ⟨pred⟩ ::= ⟨expr⟩ | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ | ⟨expr⟩ == ⟨expr⟩ | ⟨expr⟩ != ⟨expr⟩ | ⟨expr⟩ < ⟨expr⟩ | ⟨expr⟩ <= ⟨expr⟩ | ⟨expr⟩ > ⟨expr⟩ | ⟨expr⟩ >= ⟨expr⟩
+  ⟨pred⟩ ::= ⟨expr⟩ | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ 
   
-  ⟨expr⟩ ::= Int | ⟨reg⟩ | ⟨expr⟩ + ⟨expr⟩ | ⟨expr⟩ - ⟨expr⟩ | ⟨expr⟩ * ⟨expr⟩ | ⟨expr⟩ / ⟨expr⟩ | ⟨expr⟩ % ⟨expr⟩ 
+          | ⟨expr⟩ == ⟨expr⟩ | ⟨expr⟩ != ⟨expr⟩
+          
+          | ⟨expr⟩ < ⟨expr⟩ | ⟨expr⟩ <= ⟨expr⟩
+          
+          | ⟨expr⟩ > ⟨expr⟩ | ⟨expr⟩ >= ⟨expr⟩
+  
+  ⟨expr⟩ ::= Int | ⟨reg⟩
+  
+          | ⟨expr⟩ + ⟨expr⟩ | ⟨expr⟩ - ⟨expr⟩
+  
+          | ⟨expr⟩ * ⟨expr⟩ | ⟨expr⟩ / ⟨expr⟩
+          
+          | ⟨expr⟩ % ⟨expr⟩ 
   ```
