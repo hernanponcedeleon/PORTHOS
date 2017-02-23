@@ -96,7 +96,7 @@ def main(argv):
         sol = CAVPower(program, dead)
 
     else:
-        print 'The model combination is not allowed. Plase selet one combination from the paper.'
+        print 'The model combination is not allowed. Plase select one combination from the paper.'
         return
 
     if sol == sat:
