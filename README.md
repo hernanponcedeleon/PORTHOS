@@ -1,4 +1,4 @@
-# PORTHOS
+# PORTHOS: A tool to compare the behavior of programs against different memory models
 
 Usage:
 
