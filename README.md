@@ -28,13 +28,11 @@ The .pts format:
 
   ⟨inst⟩ ::= ⟨com⟩ | ⟨inst⟩; ⟨inst⟩ | while ⟨pred⟩ ⟨inst⟩ | if ⟨pred⟩ ⟨inst⟩ else ⟨inst⟩
 
-  ⟨com⟩ ::= ⟨reg⟩ ← ⟨expr⟩ | ⟨reg⟩ ← ⟨loc⟩ | ⟨loc⟩ = ⟨reg⟩ | ⟨fence⟩
+  ⟨com⟩ ::= ⟨reg⟩ <- ⟨expr⟩ | ⟨reg⟩ <- ⟨loc⟩ | ⟨loc⟩ = ⟨reg⟩ | ⟨fence⟩
   
   ⟨fence⟩ ::= hfence | lfence | cfence
   
-  ⟨pred⟩ ::= Bool | ⟨expr⟩ 
-  
-          | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ 
+  ⟨pred⟩ ::= Bool | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ 
   
           | ⟨expr⟩ == ⟨expr⟩ | ⟨expr⟩ != ⟨expr⟩
           
