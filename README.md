@@ -2,6 +2,10 @@
 
 ![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos.jpg)
 
+Requirements
+======
+- pyparsing package (http://pyparsing.wikispaces.com)
+
 Usage
 ======
 
