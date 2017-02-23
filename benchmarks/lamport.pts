@@ -1,0 +1,93 @@
+{x,y}
+
+thread 0 {
+y1 <- 0;
+i <- 1;
+while (y1 != i) {
+  x = i;
+  y1 <- y;
+  while (y1 != 0) {
+    x = i;
+    y1 <- y
+  };
+  y = i;
+  x1 <- x;
+  if (x1 == i) {
+    y1 <- i
+  }
+  else {
+    y1 <- y
+  }
+};
+a <- 0;
+y = a
+}
+
+thread 0 {
+y1 <- 0;
+i <- 1;
+while (y1 != i) {
+  x = i;
+  y1 <- y;
+  while (y1 != 0) {
+    x = i;
+    y1 <- y
+  };
+  y = i;
+  x1 <- x;
+  if (x1 == i) {
+    y1 <- i
+  }
+  else {
+    y1 <- y
+  }
+};
+a <- 0;
+y = a
+}
+
+thread 1 {
+y1 <- 0;
+i <- 2;
+while (y1 != i) {
+  x = i;
+  y1 <- y;
+  while (y1 != 0) {
+    x = i;
+    y1 <- y
+  };
+  y = i;
+  x1 <- x;
+  if (x1 == i) {
+    y1 <- i
+  }
+  else {
+    y1 <- y
+  }
+};
+a <- 0;
+y = a
+}
+
+thread 3 {
+y1 <- 0;
+i <- 3;
+while (y1 != i) {
+  x = i;
+  y1 <- y;
+  while (y1 != 0) {
+    x = i;
+    y1 <- y
+  };
+  y = i;
+  x1 <- x;
+  if (x1 == i) {
+    y1 <- i
+  }
+  else {
+    y1 <- y
+  }
+};
+a <- 0;
+y = a
+}
