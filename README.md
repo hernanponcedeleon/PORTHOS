@@ -32,7 +32,9 @@ The .pts format:
   
   ⟨fence⟩ ::= hfence | lfence | cfence
   
-  ⟨pred⟩ ::= ⟨expr⟩ | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ 
+  ⟨pred⟩ ::= Bool | ⟨expr⟩ 
+  
+          | ⟨pred⟩ and ⟨pred⟩ | ⟨pred⟩ or ⟨pred⟩ | not ⟨pred⟩ 
   
           | ⟨expr⟩ == ⟨expr⟩ | ⟨expr⟩ != ⟨expr⟩
           
