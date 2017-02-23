@@ -2,7 +2,8 @@
 
 ![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos.jpg)
 
-Usage:
+Usage
+======
 
 ```
 ./porthos.py -i <input> -s <source> -t <target>
@@ -18,6 +19,7 @@ where \<input> must be a .litmus or .pts (see below) program and \<source>, \<ta
 - cav10
 
 The .pts format:
+======
 
 ```
   program ::= {⟨loc*⟩} ⟨thrd*⟩
