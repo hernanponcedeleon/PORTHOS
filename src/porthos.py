@@ -1,4 +1,4 @@
-#!/Users/ponceh1/Documents/tools/pypy2-v5.3.0-osx64/bin/pypy
+#!/usr/bin/python
 
 import sys, getopt
 sys.path.append('./mcm/')
