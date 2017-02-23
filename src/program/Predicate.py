@@ -36,5 +36,6 @@ class Predicate:
         elif self.op == "<=": return p1 <= p2
         elif self.op == "and": return And(p1, p2)
         elif self.op == "or": return Or(p1, p2)
-        elif self.op == "not": return Not(p1, p2)
+            #elif self.op == "not": return Not(p1, p2)
+        elif self.op == "not": return Not(p1)
         else: raise Exception("Type error in Predicate encode")

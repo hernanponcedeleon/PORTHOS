@@ -29,7 +29,7 @@ Fence = Lfence | Hfence | Cfence
 Com = Local | Load | Store | Fence
 
 BoolExpr = Forward()
-BoolAtom = Literal('True') | Literal('False') | Literal('true') | Literal('false') | ArithComp | Group(lpar + BoolExpr + rpar)
+BoolAtom = Literal('True') | Literal('False') | Literal('true') | Literal('false') | ArithComp | Group(lpar + BoolExpr + rpar) | Group(Literal('not') + BoolExpr)
 BoolExpr << BoolAtom + ZeroOrMore(BoolOp + BoolExpr)
 
 Instruction = Forward()
@@ -67,7 +67,7 @@ def parsedToBool(x, locs, regs):
         return (pp.Predicate(exp1, x[1], exp2), regs)     
     elif isinstance(x, ParseResults) and len(x) == 2 and x[0] == "not":
         (exp, regs) = parsedToBool(x[1], locs, regs)
-        return (pp.Predicate("not", exp, regs))
+        return (pp.Predicate(exp, "not"), regs)
     elif str(x) in ["true", "True", "false", "False"]:
         b = str(x) == "true" or str(x) == "True"
         return (pp.Expression(b), regs)

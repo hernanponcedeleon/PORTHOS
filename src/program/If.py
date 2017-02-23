@@ -1,5 +1,6 @@
 from Thread import *
 from Register import *
+from Skip import *
 
 class If(Thread):
     
@@ -79,10 +80,10 @@ def mergeMapLastMod(map1, map2):
     return newMap
 
 def getRegs(exp):
-    #    assert(isinstance(exp, (int, Expression)))
     if isinstance(exp, int): return set()
     if isinstance(exp, Register): return set([exp])
     if isinstance(exp, Expression) and isinstance(exp.v1, int): return set()
+    elif exp.op == "not": return getRegs(exp.p1)
     elif isinstance(exp, Expression): return getRegs(exp.v1).union(getRegs(exp.v2))
     elif isinstance(exp, Predicate): return getRegs(exp.p1).union(getRegs(exp.p2))
     else: raise Exception("Problem with getRegs")
