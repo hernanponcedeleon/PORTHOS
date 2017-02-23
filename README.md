@@ -3,7 +3,7 @@
 Usage:
 
 ```
-./porthos.py -i <input> -s <source> -t <target> [-d]
+./porthos.py -i <input> -s <source> -t <target>
 ```
 
 where \<source> and \<target> must be one of the following MCMs: 
