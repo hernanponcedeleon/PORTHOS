@@ -1,4 +1,4 @@
-#!/Users/ponceh1/Documents/tools/pypy2-v5.3.0-osx64/bin/pypy
+#!/usr/bin/env python
 
 import sys, getopt
 sys.path.append('./mcm/')
@@ -41,68 +41,74 @@ def main(argv):
 
     if inputfile.endswith('.litmus'):
         program = parseLitmus(inputfile)
+        ### The parser already creates the initial writes, so no need to initialize
     elif inputfile.endswith('.pts'):
         program = parsePorthosFile(inputfile)
+        program.initialize()
     else:
         raise Exception('Input is not a .litmus or .pts file')
 
     if verbose:
         print program
 
-    program.initialize()
-
-    print "Checking portability between %s and %s" %(source,target)
+    print inputfile
+#    print "Checking portability between %s and %s" %(source,target)
 
     if source == "sc" and target == "tso":
-        sol = TSOSC(program, dead)
+         (sol, model) = TSOSC(program, dead)
     elif source == "sc" and target == "pso":
-        sol = PSOSC(program, dead)
+         (sol, model) = PSOSC(program, dead)
     elif source == "sc" and target == "rmo":
-        sol = RMOSC(program, dead)
+         (sol, model) = RMOSC(program, dead)
     elif source == "sc" and target == "alpha":
-        sol = AlphaSC(program, dead)
+         (sol, model) = AlphaSC(program, dead)
     elif source == "sc" and target == "power":
-        sol = PowerSC(program, dead)
+         (sol, model) = PowerSC(program, dead)
 
     elif source == "tso" and target == "pso":
-        sol = PSOTSO(program, dead)
+         (sol, model) = PSOTSO(program, dead)
     elif source == "tso" and target == "rmo":
-        sol = RMOTSO(program, dead)
+         (sol, model) = RMOTSO(program, dead)
     elif source == "tso" and target == "alpha":
-        sol = AlphaTSO(program, dead)
+         (sol, model) = AlphaTSO(program, dead)
     elif source == "tso" and target == "power":
-        sol = PowerTSO(program, dead)
+         (sol, model) = PowerTSO(program, dead)
 
     elif source == "pso" and target == "rmo":
-        sol = RMOPSO(program, dead)
+         (sol, model) = RMOPSO(program, dead)
     elif source == "pso" and target == "alpha":
-        sol = AlphaPSO(program, dead)
+         (sol, model) = AlphaPSO(program, dead)
     elif source == "pso" and target == "power":
-        sol = PowerPSO(program, dead)
+         (sol, model) = PowerPSO(program, dead)
 
     elif source == "rmo" and target == "alpha":
-        sol = AlphaRMO(program, dead)
+         (sol, model) = AlphaRMO(program, dead)
     elif source == "rmo" and target == "power":
-        sol = PowerRMO(program, dead)
+         (sol, model) = PowerRMO(program, dead)
 
     elif source == "alpha" and target == "rmo":
-        sol = RMOAlpha(program, dead)
+         (sol, model) = RMOAlpha(program, dead)
     elif source == "alpha" and target == "power":
-        sol = PowerAlpha(program, dead)
+         (sol, model) = PowerAlpha(program, dead)
 
     elif source == "cav10" and target == "power":
-        sol = PowerCAV(program, dead)
+         (sol, model) = PowerCAV(program, dead)
     elif source == "power" and target == "cav10":
-        sol = CAVPower(program, dead)
+         (sol, model) = CAVPower(program, dead)
 
     else:
         print 'The model combination is not allowed. Plase select one combination from the paper.'
         return
 
     if sol == sat:
-        print 'The program is not portable'
+        print "       0"
+#        print 'The program is not portable'
     else:
-        print 'The program is portable'    
+         print "       1"
+#        print 'The program is portable'    
+
+#    if model != None:
+#        program.write('lala.dot', model)
 
     return
 

@@ -1,6 +1,5 @@
 from pyparsing import *
 import Program as pp
-import Store as st
 
 digits = '0123456789'
 alphaNum = alphas + digits
@@ -29,7 +28,7 @@ Fence = Lfence | Hfence | Cfence
 Com = Local | Load | Store | Fence
 
 BoolExpr = Forward()
-BoolAtom = Literal('True') | Literal('False') | Literal('true') | Literal('false') | ArithComp | Group(lpar + BoolExpr + rpar) | Group(Literal('not') + BoolExpr)
+BoolAtom = Literal('True') | Literal('False') | Literal('true') | Literal('false') | ArithComp | Group(lpar + BoolExpr + rpar)
 BoolExpr << BoolAtom + ZeroOrMore(BoolOp + BoolExpr)
 
 Instruction = Forward()
@@ -67,7 +66,7 @@ def parsedToBool(x, locs, regs):
         return (pp.Predicate(exp1, x[1], exp2), regs)     
     elif isinstance(x, ParseResults) and len(x) == 2 and x[0] == "not":
         (exp, regs) = parsedToBool(x[1], locs, regs)
-        return (pp.Predicate(exp, "not"), regs)
+        return (pp.Predicate("not", exp, regs))
     elif str(x) in ["true", "True", "false", "False"]:
         b = str(x) == "true" or str(x) == "True"
         return (pp.Expression(b), regs)
@@ -95,7 +94,7 @@ def parsedToThread(x, locs, regs):
         if not x[2] in regs.keys(): raise Exception('Local variable \"%s\" must be initialized before using it in an assignement' %x[2])
         loc = locs[x[0]]
         reg = regs[x[2]]
-        return (st.Store(loc, reg), regs)
+        return (pp.Store(loc, reg), regs)
     elif isinstance(x, ParseResults) and len(x) > 2 and x[1] == "<-" and x[2] in locs.keys():
         if x[2] in regs.keys(): raise Exception('Error: \"%s\" is used as a global variable and a register' %(''.join(x), x[2]))
         if x[0] in locs.keys(): raise Exception('Left-hand side of \"%s\2 must be a register, \"%s\" is declared as global variable' %(''.join(x), x[0]))

@@ -1,7 +1,7 @@
 from Event import *
 
 class Init(Event):
-    
+
     def __init__(self, loc):
         assert(isinstance(loc, Location))
         self.loc = loc
@@ -13,13 +13,13 @@ class Init(Event):
         self.SAloc = None
         self.mapLastMod = {}
         self.condReg = None
-    
+
     def __str__(self):
         return "%s = 0" %(self.loc)
-    
+
     def __repr__(self):
         return "P%s" % str(self.pid)
-    
+
     def setMapLastMod(self, mapping={}):
         self.mapLastMod = mapping
         res = copy(self.mapLastMod)

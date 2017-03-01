@@ -16,9 +16,7 @@ def TsoConsistent(m):
     
     ### TSO
     enc = And(enc, satMinus('po', 'WR', events, 'ppoW'))
-    #enc = And(enc, satEq('mfence', 'fenceTso', events))
-    enc = And(enc, satUnion('mfence', 'sync', events))
-    enc = And(enc, satUnion('(mfence+sync)', 'lwsync', events,'fenceTso'))
+    enc = And(enc, satEq('sync', 'fenceTso', events))
     enc = And(enc, satUnion('(ws+fr)', 'rfe', events))
     enc = And(enc, satUnion('((ws+fr)+rfe)', 'fenceTso', events))
     enc = And(enc, satUnion('(((ws+fr)+rfe)+fenceTso)', 'ppoW', events, 'ghbW'))
@@ -30,9 +28,7 @@ def TsoInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     
     enc = satMinus('po', 'WR', events, 'ppoS')
-    #enc = And(enc, satEq('mfence', 'fenceTso', events))
-    enc = And(enc, satUnion('mfence', 'sync', events))
-    enc = And(enc, satUnion('(mfence+sync)', 'lwsync', events, 'fenceTso'))
+    enc = And(enc, satEq('sync', 'fenceTso', events))
     enc = And(enc, satUnion('ws', 'fr', events))
     enc = And(enc, satUnion('(ws+fr)', 'rfe', events))
     enc = And(enc, satUnion('((ws+fr)+rfe)', 'fenceTso', events))

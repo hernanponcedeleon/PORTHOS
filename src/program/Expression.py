@@ -1,5 +1,4 @@
 from Predicate import *
-from types import NoneType
 
 ### Expression := Int | Location | Register | Expression Op Expression.
 class Expression(Predicate):
@@ -24,10 +23,10 @@ class Expression(Predicate):
         v2 = self.v2.encode(mapping) if not isinstance(self.v2, (int, NoneType)) else self.v2
         if self.op == None: return v1
         else:
-            if self.op == "+": return v1 + v2
-            elif self.op == "-": return v1 - v2
-            elif self.op == "*": return v1 * v2
-            elif self.op == "/": return v1 / v2
-            elif self.op == "%": return v1 % v2
-            elif self.op == "xor": return 1 if (v1 == 0 and v2 == 1) or (v1 == 1 and v2 == 0) else 0
-            else: raise Exception("Type error in Expression encode")
+             if self.op == "+": return v1 + v2
+             elif self.op == "-": return v1 - v2
+             elif self.op == "*": return v1 * v2
+             elif self.op == "/": return v1 / v2
+             elif self.op == "%": return v1 % v2
+             elif self.op == "xor": return 1 if (v1 == 0 and v2 == 1) or (v1 == 1 and v2 == 0) else 0
+             else: raise Exception("Type error in Expression encode")

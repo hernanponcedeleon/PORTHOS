@@ -1,8 +1,8 @@
-import sys
-sys.path.append('./encodings/')
 from z3 import *
-from copy import copy
+from types import *
+from copy import copy, deepcopy
 from itertools import product, combinations
+from time import time
 import random
 import collections
 
@@ -61,11 +61,6 @@ def encodeEO(l):
         rest.append(l[i])
         encoding = Or(encoding, And(rest))
     return encoding
-
-#def getLast(x, mapping):
-#    """ Returns the last set value of x in mapping. """
-#    if not x in mapping.keys(): mapping[x] = 0
-#    return mapping[x]
 
 def getEvents(t):
     assert(isinstance(t, Thread))

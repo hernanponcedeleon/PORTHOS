@@ -5,6 +5,7 @@ from RMO import *
 from Alpha import *
 from Power import *
 from Dead import *
+from CAV10 import *
 
 def PowerSC(m, dead=False, write=False):
 
@@ -16,7 +17,7 @@ def PowerSC(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 def PowerTSO(m, dead=False, write=False):
 
@@ -28,7 +29,7 @@ def PowerTSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PowerPSO(m, dead=False, write=False):
@@ -41,7 +42,7 @@ def PowerPSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PowerRMO(m, dead=False, write=False):
@@ -54,7 +55,7 @@ def PowerRMO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PowerAlpha(m, dead=False, write=False):
@@ -67,7 +68,7 @@ def PowerAlpha(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PowerCAV(m, dead=False, write=False):
@@ -80,7 +81,7 @@ def PowerCAV(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def CAVPower(m, dead=False, write=False):
@@ -93,7 +94,7 @@ def CAVPower(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def AlphaSC(m, dead=False, write=False):
@@ -106,7 +107,7 @@ def AlphaSC(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def AlphaTSO(m, dead=False, write=False):
@@ -119,7 +120,7 @@ def AlphaTSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def AlphaPSO(m, dead=False, write=False):
@@ -132,7 +133,7 @@ def AlphaPSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def AlphaRMO(m, dead=False, write=False):
@@ -145,7 +146,7 @@ def AlphaRMO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def RMOSC(m, dead=False, write=False):
@@ -158,7 +159,7 @@ def RMOSC(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def RMOTSO(m, dead=False, write=False):
@@ -171,7 +172,7 @@ def RMOTSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def RMOPSO(m, dead=False, write=False):
@@ -184,7 +185,7 @@ def RMOPSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def RMOAlpha(m, dead=False, write=False):
@@ -197,7 +198,7 @@ def RMOAlpha(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PSOSC(m, dead=False, write=False):
@@ -210,7 +211,7 @@ def PSOSC(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def PSOTSO(m, dead=False, write=False):
@@ -223,7 +224,7 @@ def PSOTSO(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)
 
 
 def TSOSC(m, dead=False, write=False):
@@ -236,4 +237,4 @@ def TSOSC(m, dead=False, write=False):
 
     res = s.check()
 
-    return res
+    return (res, s.model() if res == sat else None)

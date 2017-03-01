@@ -1,9 +1,9 @@
-from Thread import *
-from Seq import *
-from If import *
 from Event import *
 from Skip import *
-from z3 import Implies, And, Or, Xor, Bool
+from Seq import *
+from If import *
+
+from z3 import Bool, And, Or, Implies, Xor
 
 def encodeCF(t):
     """ Encodes the control flow of the program. """

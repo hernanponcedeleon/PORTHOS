@@ -1,14 +1,14 @@
-from Thread import *
 from Init import *
-from Local import *
 from Load import *
+from Local import *
 from Store import *
+from Barrier import *
 from Seq import *
 from If import *
 from While import *
-from Barrier import *
 
-from z3 import Implies, And, Bool, Int
+from copy import copy
+from z3 import Int, Bool, Implies, And, Or, Not
 
 def encodeDF(t, localMap):
     """ Encodes the data flow of the thread. """
@@ -18,9 +18,9 @@ def encodeDF(t, localMap):
     ### and we need to merge the copies of the maps with the maximal values (this is done by mergeMaps)
     ### We need to return also the map for the merging
     ### Since one branch may have less occurences of a variable than other, we might need to encode
-    ### x_{i+1} = x_i in some cases (this is done by encodeMissingIndexes). See page 191 of the paper
+    ### x_{i+1} = x_i in some cases (this is done by encodeMissingIndexes). See page 191 of the paper 
     ### "Exploration of the Capabilities of Constraint Programming for Software Verification" for details
-    
+
     assert(isinstance(t, Thread))
     if isinstance(t, Init):
         if t.thread == None: raise Exception("Threads should be assigned to events and registers before calling encode()")

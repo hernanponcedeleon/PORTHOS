@@ -1,13 +1,12 @@
-from z3 import And, Or, Not
-from types import NoneType
-
 numOperations = ["+", "-", "*", "/", "%", "xor"]
 numComparisons = ["==", "!=", "<", "<=", ">", ">=",]
 boolOperations = ["and", "or", "not"]
 
+from z3 import And, Not, Or
+
 ### Predicate := Bool | Expression | Predicate And Predicate | Predicate Or Predicate | Not Predicate
 class Predicate:
-    
+
     def __init__(self, p1, op=None, p2=None):
         assert(isinstance(p1, (bool, Predicate)))
         assert(isinstance(p2, (bool, Predicate, NoneType)))
@@ -17,12 +16,12 @@ class Predicate:
         self.op = op
         self.p1 = p1
         self.p2 = p2
-    
+
     def __str__(self):
         if self.p2 != None: return "(%s %s %s)" % (str(self.p1), self.op, str(self.p2))
         elif self.op == "not": return "%s (%s)" % (self.op, str(self.p1))
         else: return str(self.p1)
-    
+
     def encode(self, mapping):
         """ Returns a constraint representing the predicate and renaming the variables to satisfy SA. """
         ### The mapping is used for the renaming
@@ -37,6 +36,5 @@ class Predicate:
         elif self.op == "<=": return p1 <= p2
         elif self.op == "and": return And(p1, p2)
         elif self.op == "or": return Or(p1, p2)
-            #elif self.op == "not": return Not(p1, p2)
-        elif self.op == "not": return Not(p1)
+        elif self.op == "not": return Not(p1, p2)
         else: raise Exception("Type error in Predicate encode")

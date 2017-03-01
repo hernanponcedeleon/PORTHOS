@@ -1,15 +1,14 @@
 from Thread import *
-from Register import *
-from Location import *
 
 ### Event := Local | Load | Store
 class Event(Thread):
+
     ### It does not have an __init__ since the corresponding one from Load or Store should be used
 
     def incCondLevel(self):
         """ Increments its conditional level. """
         self.condLevel += 1
-        return self
+        return self 
 
     def decCondLevel(self):
         """ Decrements the conditional level of itself and its sub-threads. """
