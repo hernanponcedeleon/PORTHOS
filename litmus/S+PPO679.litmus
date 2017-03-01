@@ -1,0 +1,29 @@
+PPC S+PPO679
+"Wse LwSyncdWW Rfe PosRR DpDatadW PosWR DpDatadW PosWR DpCtrldW"
+Cycle=Rfe PosRR DpDatadW PosWR DpDatadW PosWR DpCtrldW Wse LwSyncdWW
+Relax=
+Safe=Rfe Wse PosWR PosRR LwSyncdWW DpDatadW DpCtrldW
+Prefetch=0:x=F,1:x=W
+Orig=Wse LwSyncdWW Rfe PosRR DpDatadW PosWR DpDatadW PosWR DpCtrldW
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r5=z; 1:r8=a; 1:r11=x;
+}
+ P0           | P1             ;
+ li r1,2      | lwz r1,0(r2)   ;
+ stw r1,0(r2) | lwz r3,0(r2)   ;
+ lwsync       | xor r4,r3,r3   ;
+ li r3,1      | addi r4,r4,1   ;
+ stw r3,0(r4) | stw r4,0(r5)   ;
+              | lwz r6,0(r5)   ;
+              | xor r7,r6,r6   ;
+              | addi r7,r7,1   ;
+              | stw r7,0(r8)   ;
+              | lwz r9,0(r8)   ;
+              | cmpw r9,r9     ;
+              | beq  LC00      ;
+              | LC00:          ;
+              | li r10,1       ;
+              | stw r10,0(r11) ;
+exists
+(x=2 /\ 1:r1=1)

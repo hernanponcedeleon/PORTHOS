@@ -1,0 +1,13 @@
+PPC o5ls (PPCOFiveLwSyncSync)
+"Penta test: ST ; ST || LD ; LD"
+{
+ 0:r1=1; 0:r4=x; 0:r5=y; 1:r4=x; 1:r5=y;
+ 2:r2=2; 2:r5=y;
+}
+P0           | P1           | P2           ;
+stw r1,0(r4) | lwz r1,0(r5) | stw r2,0(r5) ;
+lwsync       | sync         |             ;
+stw r1,0(r5) | lwz r2,0(r4) |             ;
+
+locations [1:r1; 1:r2; y;]
+exists (1:r1=2 /\ 1:r2=0 /\ y=2)

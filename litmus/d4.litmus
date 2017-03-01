@@ -1,0 +1,13 @@
+PPC d4 (BasicDFour)
+"Simple sync test, load-store deps, causal dep"
+{
+ 0:r4=x; 0:r5=y;
+ 1:r4=x; 1:r5=y;
+}
+P0              | P1               ;
+ lwz r1,0(r5)    | lwz r1,0(r4)      ;
+ addi r1,r1,1   | addi r1,r1,2     ;
+ stw r1,0(r4)    | stw r1,0(r5)      ;
+
+
+~exists (x=0 /\ y=0)

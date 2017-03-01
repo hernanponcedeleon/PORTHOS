@@ -1,0 +1,17 @@
+PPC i2 (ITwo)
+"RR reordering w. B-cumul barrier, iwp2.1"
+{
+0:r5=x; 0:r6=y; 0:r1=0; 0:r2=0;
+ 1:r5=x; 1:r6=y; 1:r3=0; 1:r4=0;
+}
+P0           | P1           ;
+li r1,1      | lwz r3,0(r6) ; 
+stw r1,0(r5) | lwz r4,0(r5) ;
+sync         |              ;
+li r2,1      |              ;
+stw r2,0(r6) |              ;
+             |              ;
+
+locations [1:r3;1:r4;]
+
+exists(1:r3=1 /\ 1:r4=0)

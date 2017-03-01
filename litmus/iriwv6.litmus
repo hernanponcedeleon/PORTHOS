@@ -1,0 +1,17 @@
+PPC iriwv6 (PPCIriwSix)
+"plain irw, one writer"
+{
+P0:r4=x ; P0:r5=y ;
+P1:r4=x ; P1:r5=y ;
+P2:r4=x ; P2:r5=y ;
+P2:r1=1 ; P2:r2=2 ;
+}
+P0           |P1           |P2           ;
+lwz r1,0(r4) |lwz r2,0(r5) |stw r1,0(r4) ;
+lwz r2,0(r5) |lwz r1,0(r4) |stw r2,0(r5) ;
+(* Four non seq-consistent behaviors *)
+exists
+((0:r1=0 /\ 0:r2=0 /\ 1:r1=0 /\ 1:r2=2) \/
+ (0:r1=0 /\ 0:r2=2 /\ 1:r1=0 /\ 1:r2=2) \/
+ (0:r1=1 /\ 0:r2=0 /\ 1:r1=0 /\ 1:r2=2) \/
+ (0:r1=1 /\ 0:r2=2 /\ 1:r1=0 /\ 1:r2=2)) 

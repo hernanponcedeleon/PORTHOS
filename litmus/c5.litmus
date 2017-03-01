@@ -1,0 +1,13 @@
+PPC c5 (PPCBasicCFive)
+"local-dep-wrong barrier|sync"
+{
+P0:r4=x ; P0:r5=y ; P0:r2=2 ;
+P1:r4=x ; P1:r5=y ; P1:r1=1 ;
+}
+P0           |P1           ;
+stw r2,0(r5) |stw r1,0(r4) ;
+lwz r2,0(r5) |             ;
+lwsync       |sync         ;
+lwz r1,0(r4) |lwz r2,0(r5) ;
+exists (0:r1=0 /\ 1:r2=0)
+(* Non seq consistent behavior observed on doko *)

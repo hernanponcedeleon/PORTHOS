@@ -1,0 +1,21 @@
+PPC DETOUR0877
+"LwSyncdWW Wse DetourW PodRW PosWR Fre"
+Cycle=Fre LwSyncdWW Wse DetourW PodRW PosWR
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=T
+Com=Ws Fr
+Orig=LwSyncdWW Wse DetourW PodRW PosWR Fre
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r5=x;
+2:r2=y;
+}
+ P0           | P1           | P2           ;
+ li r1,2      | li r1,2      | li r1,3      ;
+ stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) ;
+ lwsync       | lwz r3,0(r2) |              ;
+ li r3,1      | li r4,1      |              ;
+ stw r3,0(r4) | stw r4,0(r5) |              ;
+ sync         | lwz r6,0(r5) |              ;
+ lwz r5,0(r4) |              |              ;
+exists
+(0:r5=2 /\ x=2 /\ 1:r3=3 /\ 1:r6=1)

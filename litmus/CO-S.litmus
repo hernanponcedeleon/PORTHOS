@@ -1,0 +1,11 @@
+PPC CO-S
+{
+0:r2=x;
+1:r2=x;
+}
+ P0          | P1           ;
+ li r0,1     | lwz r0,0(r2) ;
+ stw r0,0(r2)| li r1,3      ;
+ li r1,2     | stw r1,0(r2) ;
+ stw r1,0(r2)|              ;
+exists (1:r0=2 /\ x=2 \/ 1:r0=1 /\ x=1)

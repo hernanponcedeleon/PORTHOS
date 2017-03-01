@@ -1,0 +1,19 @@
+PPC DETOUR0890
+"LwSyncdWW Wse PodWR Fri PodWR Fre"
+Cycle=Fri PodWR Fre LwSyncdWW Wse PodWR
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=T
+Com=Ws Fr
+Orig=LwSyncdWW Wse PodWR Fri PodWR Fre
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=z; 1:r7=x;
+}
+ P0           | P1           ;
+ li r1,1      | li r1,2      ;
+ stw r1,0(r2) | stw r1,0(r2) ;
+ lwsync       | lwz r3,0(r4) ;
+ li r3,1      | li r5,1      ;
+ stw r3,0(r4) | stw r5,0(r4) ;
+              | lwz r6,0(r7) ;
+exists
+(y=2 /\ 1:r3=0 /\ 1:r6=0)

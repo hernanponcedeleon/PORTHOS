@@ -1,0 +1,16 @@
+PPC Z6.1+sync+po+lwsync
+"SyncdWW Wse PodWW Rfe LwSyncdRW Wse"
+Cycle=Rfe LwSyncdRW Wse SyncdWW Wse PodWW
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=z;
+2:r2=z; 2:r4=x;
+}
+ P0           | P1           | P2           ;
+ li r1,2      | li r1,2      | lwz r1,0(r2) ;
+ stw r1,0(r2) | stw r1,0(r2) | lwsync       ;
+ sync         | li r3,1      | li r3,1      ;
+ li r3,1      | stw r3,0(r4) | stw r3,0(r4) ;
+ stw r3,0(r4) |              |              ;
+exists
+(x=2 /\ y=2 /\ 2:r1=1)

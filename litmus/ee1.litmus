@@ -1,0 +1,13 @@
+PPC ee1 (EEOne)
+"4 proc, st/st st/st, no barriers"
+{
+0:r5=x ;
+1:r6=y ;
+2:r5=x ; 2:r6=y ; 2:r1=1 ; 2:r2=2;
+3:r5=x ; 3:r6=y ; 3:r1=1 ; 3:r2=2;
+}
+P0           |P1           |P2           |P3           ;
+lwz r1,0(r5) |lwz r1,0(r6) |stw r1,0(r5) |stw r1,0(r6) ;
+             |             |stw r2,0(r6) |stw r2,0(r5) ;
+
+locations [x; y; 0:r1; 1:r1; ]

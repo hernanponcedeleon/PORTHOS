@@ -1,0 +1,16 @@
+PPC rwcv2 (RWCTwo)
+{
+0:r5=x;
+1:r5=x; 1:r6=y;
+2:r5=x; 2:r6=y;
+0:r1=1;
+2:r1=1;
+}
+P0          |P1          |P2          ;
+stw r1,0(r5)|lwz r1,0(r5)|stw r1,0(r6);
+            |lwsync      |lwsync      ;
+            |lwz r2,0(r6)|lwz r3,0(r5);
+
+locations [1:r1; 1:r2; 2:r3;] 
+final (1:r1 = 1 /\ 1:r2 = 0 /\ 2:r3 = 0); 
+with default: exists;

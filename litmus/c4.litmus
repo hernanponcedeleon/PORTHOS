@@ -1,0 +1,13 @@
+PPC c4 (BasicCFour)
+"Simple sync test, store-sync-load|store-lwsync-load"
+{
+ 0:r1=1; 0:r4=x; 0:r5=y;
+ 1:r1=1; 1:r4=x; 1:r5=y;
+}
+P0              | P1               ;
+ stw r1,0(r4)    | stw r1,0(r5)      ;
+ sync           | lwsync           ;
+ lwz r2,0(r5)    | lwz r2,0(r4)      ;
+
+exists (0:r2=0 /\ 1:r2=0)
+(* because lwsync does not order store-load *)

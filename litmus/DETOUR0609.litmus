@@ -1,0 +1,21 @@
+PPC DETOUR0609
+"SyncdWR Fre PodWR DpDatadW DetourW Fre"
+Cycle=Fre PodWR DpDatadW DetourW Fre SyncdWR
+Prefetch=0:x=F,0:y=T,1:y=F,1:x=T
+Com=Fr Fr
+Orig=SyncdWR Fre PodWR DpDatadW DetourW Fre
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=z; 1:r6=x;
+2:r2=x;
+}
+ P0           | P1           | P2           ;
+ li r1,3      | li r1,1      | li r1,2      ;
+ stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) ;
+ sync         | lwz r3,0(r4) |              ;
+ lwz r3,0(r4) | xor r5,r3,r3 |              ;
+              | addi r5,r5,1 |              ;
+              | stw r5,0(r6) |              ;
+              | lwz r7,0(r6) |              ;
+exists
+(0:r3=0 /\ x=3 /\ 1:r7=2)

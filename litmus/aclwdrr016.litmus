@@ -1,0 +1,19 @@
+PPC aclwdrr016
+"Fre LwSyncdWW Wse SyncdWR Fre Rfe LwSyncdRR"
+Cycle=Fre LwSyncdWW Wse SyncdWR Fre Rfe LwSyncdRR
+Relax=ACLwSyncdRR
+Safe=Fre Wse SyncdWR LwSyncdWW
+{
+0:r2=z; 0:r4=x;
+1:r2=x; 1:r4=y;
+2:r2=y;
+3:r2=y; 3:r4=z;
+}
+ P0           | P1           | P2           | P3           ;
+ li r1,1      | li r1,2      | li r1,1      | lwz r1,0(r2) ;
+ stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) | lwsync       ;
+ lwsync       | sync         |              | lwz r3,0(r4) ;
+ li r3,1      | lwz r3,0(r4) |              |              ;
+ stw r3,0(r4) |              |              |              ;
+exists
+(x=2 /\ 1:r3=0 /\ 3:r1=1 /\ 3:r3=0)

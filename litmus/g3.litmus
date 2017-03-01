@@ -1,0 +1,12 @@
+PPC g3 (BasicGThree)
+{
+0:r4=x ; 0:r5=y; 0:r1=1 ; 
+1:r4=x ; 1:r5=y; 1:r2=2 ;
+}
+P0           |     P1       ;
+stw r1,0(r4) | stw r2,0(r5) ;
+lwsync       | sync         ;
+stw r1,0(r5) | lwz r3,0(r4) ;
+
+locations [y; 1:r3;]
+~exists (1:r3=0 /\ y=2)

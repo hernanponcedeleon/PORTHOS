@@ -1,0 +1,23 @@
+PPC DETOUR0167
+"DpDatadW Rfe DetourR DpCtrldW Wsi Rfe"
+Cycle=Rfe DetourR DpCtrldW Wsi Rfe DpDatadW
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Rf Rf
+Orig=DpDatadW Rfe DetourR DpCtrldW Wsi Rfe
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r5=x;
+2:r2=y;
+}
+ P0           | P1           | P2           ;
+ lwz r1,0(r2) | lwz r1,0(r2) | li r1,2      ;
+ xor r3,r1,r1 | lwz r3,0(r2) | stw r1,0(r2) ;
+ addi r3,r3,1 | cmpw r3,r3   |              ;
+ stw r3,0(r4) | beq  LC00    |              ;
+              | LC00:        |              ;
+              | li r4,1      |              ;
+              | stw r4,0(r5) |              ;
+              | li r6,2      |              ;
+              | stw r6,0(r5) |              ;
+exists
+(0:r1=2 /\ 1:r1=1 /\ 1:r3=2)

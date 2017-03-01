@@ -1,0 +1,22 @@
+PPC PPO015
+"LwSyncdWW Rfe DpDatadW PosWW PosWR DpCtrlIsyncdR Fre"
+Cycle=Rfe DpDatadW PosWW PosWR DpCtrlIsyncdR Fre LwSyncdWW
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=z; 1:r8=x;
+}
+ P0           | P1           ;
+ li r1,1      | lwz r1,0(r2) ;
+ stw r1,0(r2) | xor r3,r1,r1 ;
+ lwsync       | addi r3,r3,1 ;
+ li r3,1      | stw r3,0(r4) ;
+ stw r3,0(r4) | li r5,2      ;
+              | stw r5,0(r4) ;
+              | lwz r6,0(r4) ;
+              | cmpw r6,r6   ;
+              | beq  LC00    ;
+              | LC00:        ;
+              | isync        ;
+              | lwz r7,0(r8) ;
+exists
+(z=2 /\ 1:r1=1 /\ 1:r7=0)

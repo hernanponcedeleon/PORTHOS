@@ -1,0 +1,15 @@
+PPC wrcv2 (PPCWRCTwo)
+"write-to_read causality, boehm adve PLDI'08 (Fig 5.)"
+{
+0:r1=x; 0:r9=1; 
+1:r1=x; 1:r2=y; 1:r9=1;
+2:r1=x; 2:r2=y;
+} 
+P0	    | P1	  | P2         ;
+stw r9,0(r1) | lwz r5,0(r1) | lwz r5,0(r2)  ;
+            | lwsync      | lwsync       ;
+            | stw r9,0(r2) | lwz r6,0(r1)  ;
+
+exists (P1:r5=1 /\ P2:r5=1 /\ P2:r6=0)
+(* Variations on ppc-cpp.wrc-adir2.litmus*)
+

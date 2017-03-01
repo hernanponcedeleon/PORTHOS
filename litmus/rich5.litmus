@@ -1,0 +1,17 @@
+PPC rich5 (RichFive)
+"Open issue in cpp atomics, uk311"
+(* http://www.open-std.org/jtc1/sc22/wg21/docs/lwg-active.html#926 *)
+{
+0:r5=x; 0:r6=y;
+1:r5=x; 1:r6=y;
+}
+P0           | P1         ;
+li r9,1      |li r9,2     ;
+stw r9,0(r5) |stw r9,0(r6);
+sync         |sync        ;
+stw r9,0(r6) |lwz r2,0(r5);
+sync         |            ;
+lwz r1,0(r6) |            ;
+
+locations [y;]
+~exists ((0:r1=0 \/ 0:r1=2) /\ 1:r2=0)

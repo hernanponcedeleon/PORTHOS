@@ -1,0 +1,13 @@
+PPC CO-R+sync+po
+{
+0:r2=x;
+1:r2=x;
+}
+ P0           | P1           ;
+ li r0,1      | li r0,3      ;
+ stw r0,0(r2) | stw r0,0(r2) ;
+ sync         | lwz r1,0(r2) ;
+ li r1,2      |              ;
+ stw r1,0(r2) |              ;
+exists (x=3 /\ (1:r1=1 \/ 1:r1=2) \/ x=1)
+

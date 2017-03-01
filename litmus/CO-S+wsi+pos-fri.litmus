@@ -1,0 +1,18 @@
+PPC CO-S+wsi+pos-fri
+"Wsi Rfe PosRR Fri Wse"
+(* Similar to CO-LB+fri+pos-fri.litmus *)
+Cycle=Rfe PosRR Fri Wse Wsi
+Prefetch=0:x=F,0:x=W,1:x=F,1:x=W
+Com=Rf Ws
+Orig=Wsi Rfe PosRR Fri Wse
+{
+0:r2=x;
+1:r2=x;
+}
+ P0           | P1           ;
+ li r1,1      | lwz r1,0(r2) ;
+ stw r1,0(r2) | lwz r3,0(r2) ;
+ li r3,2      | li r4,3      ;
+ stw r3,0(r2) | stw r4,0(r2) ;
+forall
+((x=3 /\ ((1:r3=2 /\ (1:r1=2 \/ 1:r1=1 \/ 1:r1=0)) \/ (1:r3=1 /\ (1:r1=1 \/ 1:r1=0)) \/ (1:r3=0 /\ 1:r1=0))) \/ (x=2 /\ ((1:r3=1 /\ (1:r1=1 \/ 1:r1=0)) \/ (1:r3=0 /\ 1:r1=0))))

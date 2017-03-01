@@ -1,0 +1,22 @@
+PPC DETOUR1134
+"LwSyncdWW Rfe PodRW Rfi DpCtrldW Wse"
+Cycle=Rfi DpCtrldW Wse LwSyncdWW Rfe PodRW
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Rf Ws
+Orig=LwSyncdWW Rfe PodRW Rfi DpCtrldW Wse
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=z; 1:r7=x;
+}
+ P0           | P1           ;
+ li r1,2      | lwz r1,0(r2) ;
+ stw r1,0(r2) | li r3,1      ;
+ lwsync       | stw r3,0(r4) ;
+ li r3,1      | lwz r5,0(r4) ;
+ stw r3,0(r4) | cmpw r5,r5   ;
+              | beq  LC00    ;
+              | LC00:        ;
+              | li r6,1      ;
+              | stw r6,0(r7) ;
+exists
+(x=2 /\ 1:r1=1 /\ 1:r5=1)

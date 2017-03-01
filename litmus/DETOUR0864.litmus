@@ -1,0 +1,23 @@
+PPC DETOUR0864
+"LwSyncdWW Wse Rfi DetourR DpCtrlIsyncdR Fre"
+Cycle=Rfi DetourR DpCtrlIsyncdR Fre LwSyncdWW Wse
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=T
+Com=Ws Fr
+Orig=LwSyncdWW Wse Rfi DetourR DpCtrlIsyncdR Fre
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r6=x;
+2:r2=y;
+}
+ P0           | P1           | P2           ;
+ li r1,1      | li r1,2      | li r1,3      ;
+ stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) ;
+ lwsync       | lwz r3,0(r2) |              ;
+ li r3,1      | lwz r4,0(r2) |              ;
+ stw r3,0(r4) | cmpw r4,r4   |              ;
+ sync         | beq  LC00    |              ;
+ lwz r5,0(r4) | LC00:        |              ;
+              | isync        |              ;
+              | lwz r5,0(r6) |              ;
+exists
+(0:r5=2 /\ 1:r3=2 /\ 1:r4=3 /\ 1:r5=0)

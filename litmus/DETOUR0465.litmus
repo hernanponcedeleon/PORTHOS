@@ -1,0 +1,21 @@
+PPC DETOUR0465
+"PodWR Fri Rfi PosRW Rfe DpDatadW Wse"
+Cycle=Rfi PosRW Rfe DpDatadW Wse PodWR Fri
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Rf Ws
+Orig=PodWR Fri Rfi PosRW Rfe DpDatadW Wse
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=x;
+}
+ P0           | P1           ;
+ li r1,2      | lwz r1,0(r2) ;
+ stw r1,0(r2) | xor r3,r1,r1 ;
+ lwz r3,0(r4) | addi r3,r3,1 ;
+ li r5,1      | stw r3,0(r4) ;
+ stw r5,0(r4) |              ;
+ lwz r6,0(r4) |              ;
+ li r7,2      |              ;
+ stw r7,0(r4) |              ;
+exists
+(0:r3=0 /\ 0:r6=1 /\ x=2 /\ 1:r1=2)

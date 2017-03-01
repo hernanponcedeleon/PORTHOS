@@ -1,0 +1,12 @@
+PPC b1 (bOne)
+"Simple sync test"
+{
+0:r6=1; 0:r4=x; 0:r5=y;
+1:r4=x; 1:r5=y;
+}
+P0               | P1                ;
+ stw r6,0(r4)    | lwz r1,0(r5)      ;
+ stw r6,0(r5)    | lwz r2,0(r4)      ;
+
+
+exists (1:r1=1 /\ 1:r2=0)

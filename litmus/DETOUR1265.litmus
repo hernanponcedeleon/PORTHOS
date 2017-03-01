@@ -1,0 +1,22 @@
+PPC DETOUR1265
+"LwSyncdWW Wse DetourW DetourR DpDatadW Wse"
+Cycle=Wse DetourW DetourR DpDatadW Wse LwSyncdWW
+Prefetch=0:x=F,0:y=W,1:y=F,1:x=W
+Com=Ws Ws
+Orig=LwSyncdWW Wse DetourW DetourR DpDatadW Wse
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r6=x;
+2:r2=y;
+3:r2=y;
+}
+ P0           | P1           | P2           | P3           ;
+ li r1,2      | li r1,2      | li r1,3      | li r1,4      ;
+ stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) | stw r1,0(r2) ;
+ lwsync       | lwz r3,0(r2) |              |              ;
+ li r3,1      | lwz r4,0(r2) |              |              ;
+ stw r3,0(r4) | xor r5,r4,r4 |              |              ;
+ sync         | addi r5,r5,1 |              |              ;
+ lwz r5,0(r4) | stw r5,0(r6) |              |              ;
+exists
+(0:r5=2 /\ x=2 /\ 1:r3=3 /\ 1:r4=4)

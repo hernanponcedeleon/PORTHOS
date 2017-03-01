@@ -1,0 +1,24 @@
+PPC m6l (PPCMSixLwSync)
+"hexa, write-to_read causality, boehm adve PLDI'08 (Fig 5.)"
+{
+P0:r5=x;
+P1:r5=x; P1:r6=y;
+P2:r5=x; P2:r6=y;
+P0:r1=1; P1:r1=1;
+P3:r2=2; P3:r6=y;
+} 
+P0 	    | P1 	  | P2           |P3          ;
+stw r1,0(r5) | lwz r2,0(r5) | lwz r2,0(r6)  |stw r2,0(r6);
+            | lwsync      | lwsync       |            ;
+            | stw r1,0(r6) | lwz r1,0(r5)  |            ;
+
+locations [x;y;]
+exists (1:r2=1 /\ 2:r2=1 /\ 2:r1=0)
+(* According to boehm failure would reveal non-atomicity of writes *)
+(* 
+<11>[1:r2=1; 2:r1=0; 2:r2=2; x=1; y=2;]      
+Notice: non-observed in sync test
+-[1:r2=1; 2:r1=0; 2:r2=1; x=1; y=1;]
+-[1:r2=1; 2:r1=0; 2:r2=1; x=1; y=2;]
+Those are wrc non-sc coutcomes.  
+*)

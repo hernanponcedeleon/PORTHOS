@@ -1,0 +1,20 @@
+PPC podrw004
+"Wse SyncdWW Rfe SyncdRW Rfe SyncdRW Rfe SyncdRW Rfe PodRW"
+Cycle=Wse SyncdWW Rfe SyncdRW Rfe SyncdRW Rfe SyncdRW Rfe PodRW
+Relax=PodRW
+Safe=Wse BCSyncdWW BCSyncdRW
+{
+0:r2=b; 0:r4=x;
+1:r2=x; 1:r4=y;
+2:r2=y; 2:r4=z;
+3:r2=z; 3:r4=a;
+4:r2=a; 4:r4=b;
+}
+ P0           | P1           | P2           | P3           | P4           ;
+ li r1,2      | lwz r1,0(r2) | lwz r1,0(r2) | lwz r1,0(r2) | lwz r1,0(r2) ;
+ stw r1,0(r2) | sync         | sync         | sync         | li r3,1      ;
+ sync         | li r3,1      | li r3,1      | li r3,1      | stw r3,0(r4) ;
+ li r3,1      | stw r3,0(r4) | stw r3,0(r4) | stw r3,0(r4) |              ;
+ stw r3,0(r4) |              |              |              |              ;
+exists
+(b=2 /\ 1:r1=1 /\ 2:r1=1 /\ 3:r1=1 /\ 4:r1=1)

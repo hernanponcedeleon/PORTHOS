@@ -1,0 +1,19 @@
+PPC safe090
+"Rfe SyncdRW Rfe SyncsRR Fre SyncdWW Wse"
+Cycle=Rfe SyncdRW Rfe SyncsRR Fre SyncdWW Wse
+Relax=
+Safe=Fre Wse SyncdWW ACSyncsRR ACSyncdRW
+{
+0:r2=y; 0:r4=x;
+1:r2=x;
+2:r2=x; 2:r4=y;
+3:r2=y;
+}
+ P0           | P1           | P2           | P3           ;
+ lwz r1,0(r2) | lwz r1,0(r2) | li r1,2      | li r1,2      ;
+ sync         | sync         | stw r1,0(r2) | stw r1,0(r2) ;
+ li r3,1      | lwz r3,0(r2) | sync         |              ;
+ stw r3,0(r4) |              | li r3,1      |              ;
+              |              | stw r3,0(r4) |              ;
+exists
+(x=2 /\ y=2 /\ 0:r1=2 /\ 1:r1=1 /\ 1:r3=1)

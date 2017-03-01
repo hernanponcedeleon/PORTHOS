@@ -1,0 +1,11 @@
+PPC CO-2+2W
+{
+0:r2=x;
+1:r2=x;
+}
+ P0           | P1           ;
+ li r0,2      | li r0,2      ;
+ stw r0,0(r2) | stw r0,0(r2) ;
+ li r1,1      | li r1,1      ;
+ stw r1,0(r2) | stw r1,0(r2) ;
+exists (x=2)

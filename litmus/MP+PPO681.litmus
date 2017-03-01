@@ -1,0 +1,22 @@
+PPC MP+PPO681
+"Fre LwSyncdWW Rfe DpCtrldW PosWR"
+Cycle=Rfe DpCtrldW PosWR Fre LwSyncdWW
+Relax=
+Safe=Rfe Fre PosWR LwSyncdWW DpCtrldW
+Prefetch=1:x=T
+Com=Rf Fr
+Orig=Fre LwSyncdWW Rfe DpCtrldW PosWR
+{
+0:r2=x; 0:r4=y;
+1:r2=y; 1:r4=x;
+}
+ P0           | P1           ;
+ li r1,2      | lwz r1,0(r2) ;
+ stw r1,0(r2) | cmpw r1,r1   ;
+ lwsync       | beq  LC00    ;
+ li r3,1      | LC00:        ;
+ stw r3,0(r4) | li r3,1      ;
+              | stw r3,0(r4) ;
+              | lwz r5,0(r4) ;
+exists
+(x=2 /\ 1:r1=1 /\ 1:r5=1)

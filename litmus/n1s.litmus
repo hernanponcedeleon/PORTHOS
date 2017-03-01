@@ -1,0 +1,16 @@
+PPC n1s  (PPCNOneSync)
+"not exactly iriw, sync barriers"
+{
+P0:r4=x ; P0:r5=y ;
+P1:r4=x ; P1:r5=y ;
+P2:r4=x ; P2:r5=y ;
+P3:r4=x ; P3:r5=y ;
+P2:r1=1 ; P2:r2=4 ;
+P3:r2=2 ; P3:r1=3 ;
+}
+P0           |P1           |P2           |P3           ;
+lwz r1,0(r4) |lwz r1,0(r4) |stw r2,0(r5) |stw r2,0(r5) ;
+sync         |sync         |sync         |sync         ;
+lwz r2,0(r5) |lwz r2,0(r5) |stw r1,0(r4) |stw r1,0(r4) ;
+
+locations [x; y; 0:r1; 0:r2; 1:r1; 1:r2;]

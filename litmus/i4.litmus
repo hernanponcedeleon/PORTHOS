@@ -1,0 +1,17 @@
+PPC i4 (IFour)
+"WW reordering"
+{
+0:r5=x; 0:r6=y; 
+1:r5=x; 1:r6=y; 
+2:r5=x;
+3:r6=y;
+}
+P0           | P1           |P2           |P3          ;
+li r1,1      | li r3,3      |lwz r1,0(r5) |lwz r1,0(r6);
+stw r1,0(r5) | stw r3,0(r6) |lwz r2,0(r5) |lwz r2,0(r6);
+li r2,2      | li r4,4      |             |            ;
+stw r2,0(r6) | stw r4,0(r5) |             |            ;
+             |              |             |            ;
+
+
+exists(2:r1=4 /\ 2:r2=1 /\ 3:r1=2 /\ 3:r2=3)

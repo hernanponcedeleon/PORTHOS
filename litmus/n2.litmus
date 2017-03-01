@@ -1,0 +1,17 @@
+PPC n2  (PPCNTwo)
+"super iriw, no barriers"
+{
+P0:r4=x ; P0:r5=y ;
+P1:r6=z ; P1:r7=t ;
+P2:r5=y ; P2:r6=z ;
+P3:r7=t ; P3:r4=x ;
+P2:r1=1 ; P2:r2=1 ;
+P3:r2=1 ; P3:r1=1 ;
+}
+P0           |P1           |P2           |P3           ;
+lwz r1,0(r4) |lwz r1,0(r6) |stw r2,0(r5) |stw r2,0(r7) ; 
+lwz r2,0(r5) |lwz r2,0(r7) |stw r1,0(r6) |stw r1,0(r4) ;
+
+locations [0:r1; 0:r2; 1:r1; 1:r2;]
+exists(0:r1=1 /\ 1:r1=1 /\ 0:r2=0 /\ 1:r2=0)
+(* Perfect octogon *)

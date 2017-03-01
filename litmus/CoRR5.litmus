@@ -1,0 +1,13 @@
+PPC CoRR5
+"CoRR internal write(s)"
+{
+0:r5=x;
+1:r5=x;
+}
+ P0            | P1            ;
+ li r9, 1      | li r9,2      ;
+ stw r9,0(r5) | stw r9,0(r5) ;
+ lwz r1,0(r5) | lwz r1,0(r5) ;
+ lwz r2,0(r5) | lwz r2,0(r5) ;
+(* SC condition *)
+forall (0:r1=2 /\ (0:r2=2 /\ (1:r1=2 /\ (1:r2=2))) \/ 0:r1=1 /\ (0:r2=2 /\ (1:r1=2 /\ (1:r2=2)) \/ 0:r2=1 /\ (1:r1=2 /\ (1:r2=2 \/ 1:r2=1) \/ 1:r1=1 /\ (1:r2=1))))
