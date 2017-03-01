@@ -13,18 +13,21 @@ from z3 import *
 def main(argv):
 
     inputfile = None
+    outputfile = None
     source = None
     target = None
     dead = False
     verbose = False
     try:
-        opts, args = getopt.getopt(argv,"i:s:t:dv")
+        opts, args = getopt.getopt(argv,"i:o:s:t:dv")
     except getopt.GetoptError:
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-i":
             inputfile = arg
-	elif opt == "-s":
+        if opt == "-o":
+            outputfile = arg
+        elif opt == "-s":
             source = arg
         elif opt == "-t":
             target = arg
@@ -33,7 +36,7 @@ def main(argv):
         elif opt == "-v":
             verbose = True
     if inputfile == None:
-	raise Exception("No input file loaded")
+	    raise Exception("No input file loaded")
     if not (source in ["sc", "tso", "pso", "rmo", "alpha", "power", "cav10"]):
         raise Exception('Source model is not valid. Select between sc, tso, pso, rmo, alpha, power, cav10')
     if not (target in ["tso", "pso", "rmo", "alpha", "power", "cav10"]):
@@ -51,8 +54,7 @@ def main(argv):
     if verbose:
         print program
 
-    print inputfile
-#    print "Checking portability between %s and %s" %(source,target)
+    print "Checking portability between %s and %s" %(source,target)
 
     if source == "sc" and target == "tso":
          (sol, model) = TSOSC(program, dead)
@@ -101,14 +103,13 @@ def main(argv):
         return
 
     if sol == sat:
-        print "       0"
-#        print 'The program is not portable'
+        print 'The program is not portable'
     else:
-         print "       1"
-#        print 'The program is portable'    
+        print 'The program is portable'
 
-#    if model != None:
-#        program.write('lala.dot', model)
+#    if outputfile != None and model != None:
+#        if verbose: print "Output written to %s.dot" %outputfile
+#        program.write('%s.dot' %outputfile, model)
 
     return
 
