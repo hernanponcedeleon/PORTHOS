@@ -1,4 +1,5 @@
 from Predicate import *
+from types import NoneType
 
 ### Expression := Int | Location | Register | Expression Op Expression.
 class Expression(Predicate):

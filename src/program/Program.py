@@ -24,16 +24,16 @@ from Thread import *
 from While import *
 
 ### Integer variable to encode that ws is a total order
-def wsVar(e): return Int("ws:L%s(%s)" %(e.loc, ev(e)))
+#def wsVar(e): return Int("ws:L%s(%s)" %(e.loc, ev(e)))
 
 ### Integer variable to encode that po is a total order
-def poVar(e, arch): return Int("%s_po:T%s(%s)" %(arch, e.thread, ev(e)))
+#def poVar(e, arch): return Int("%s_po:T%s(%s)" %(arch, e.thread, ev(e)))
 
 ### Integer variable to encode that ghb is a partial order
-def ghbVar(e): return Int("ghb(%s)" %(ev(e)))
+#def ghbVar(e): return Int("ghb(%s)" %(ev(e)))
 
 ### Integer variable to encode that uniProc is acylic
-def uniProcVar(e): return Int("up(%s)" %(ev(e)))
+#def uniProcVar(e): return Int("up(%s)" %(ev(e)))
 
 ### Bool variable to encode that two events are related under rel
 def edge(rel, e1, e2, arch=""): return Bool("%s%s(%s,%s)" %(rel, arch, ev(e1), ev(e2)))
@@ -62,13 +62,13 @@ def encodeEO(l):
         encoding = Or(encoding, And(rest))
     return encoding
 
-def getEvents(t):
-    assert(isinstance(t, Thread))
-    if isinstance(t, Event): return [t]
-    elif isinstance(t, Skip): return []
-    elif isinstance(t, While): return getEvents(t.t1)
-    elif isinstance(t, (If, Seq)): return getEvents(t.t1) + getEvents(t.t2)
-    else: raise Exception ("Type error in getEvents")
+#def getEvents(t):
+#    assert(isinstance(t, Thread))
+#    if isinstance(t, Event): return [t]
+#    elif isinstance(t, Skip): return []
+#    elif isinstance(t, While): return getEvents(t.t1)
+#    elif isinstance(t, (If, Seq)): return getEvents(t.t1) + getEvents(t.t2)
+#    else: raise Exception ("Type error in getEvents")
 
 class Program:
 
@@ -255,10 +255,5 @@ def exportLitmus(m, name, satSolution):
     for l in locs:
         writeLocs += '%s;' %str(l)
     litmus += '%s]\n' %writeLocs        
-#    writeRegs = "exists (%s:%s=0" %(regs[0][0], regs[0][1])
-#    for r in regs[1:]:
-#        writeRegs += "/\ %s:%s=0" %(r[0], r[1])
-#    litmus += '%s)\n' %writeRegs
 
     return litmus
-
