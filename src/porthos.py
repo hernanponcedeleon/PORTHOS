@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#!~/Documents/tools/pypy2-v5.3.0-osx64/bin/pypy
 
 import sys, getopt
 sys.path.append('./mcm/')
@@ -37,7 +38,7 @@ def main(argv):
             if inputfile.endswith('.litmus'):
                 outputfile = inputfile.split("/")[-1].split(".litmus")[0]
             else:
-                outputfile = inputfile.split(".pts")[0]
+                outputfile = inputfile.split("/")[-1].split(".pts")[0]
         elif opt == "-s":
             source = arg
         elif opt == "-t":
@@ -128,9 +129,8 @@ def main(argv):
         print bcolors.OKGREEN + 'The program is portable' + bcolors.ENDC
 
     if outputfile != None and model != None:
-        if verbose: print "Output written to %s.dot" %outputfile
         program.write('%s.dot' %outputfile, model, map(lambda r: "%s(" %r, show))
-
+        print "Output written to %s.dot" %outputfile
     return
 
 if __name__ == "__main__":

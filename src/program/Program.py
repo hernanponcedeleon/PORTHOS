@@ -2,8 +2,6 @@ from z3 import *
 from types import *
 from copy import copy, deepcopy
 from itertools import product, combinations
-#import random
-#import collections
 from re import search
 
 from ControlFlow import *
@@ -26,18 +24,6 @@ from While import *
 def intVar(name, e): return Int('%s(%s)' %(name, ev(e)))
 
 def intCount(rel, e1, e2): return Int('%s(%s,%s)' %(rel, ev(e1), ev(e2)))
-
-### Integer variable to encode that ws is a total order
-#def wsVar(e): return Int("ws:L%s(%s)" %(e.loc, ev(e)))
-
-### Integer variable to encode that po is a total order
-#def poVar(e, arch): return Int("%s_po:T%s(%s)" %(arch, e.thread, ev(e)))
-
-### Integer variable to encode that ghb is a partial order
-#def ghbVar(e): return Int("ghb(%s)" %(ev(e)))
-
-### Integer variable to encode that uniProc is acylic
-#def uniProcVar(e): return Int("up(%s)" %(ev(e)))
 
 ### Bool variable to encode that two events are related under rel
 def edge(rel, e1, e2, arch=""): return Bool("%s%s(%s,%s)" %(rel, arch, ev(e1), ev(e2)))
@@ -152,7 +138,7 @@ class Program:
     	    f.write("subgraph cluster_proc%s { ran=sink; label = \"Thread %s\"; color=magenta; shape=box;\n" % (index, index))
             for e in procEvents:
                 if isinstance(e, Init): continue
-                f.write ('\te%s [label="%s"];\n' % (e.eid, e))
+                f.write ('\te%s [label="E%s\n%s"];\n' % (e.eid, e.eid, e))
     	    f.write("\t}\n")
     	for e1 in self.storeEvents() + self.initEvents():
     	    ## Finds and writes the transitive reduction of WS using the schedule imposed by wsVar
@@ -161,30 +147,35 @@ class Program:
                 if int(str(model[intVar('ws', e1)])) == int(str(model[intVar('ws',e2)]))-1:
                     f.write ('\te%d -> e%d [label="ws", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
         for e1 in events:
+            if isinstance(e1, Init): continue
             sameProcEvents = filter(lambda e: e.thread == e1.thread, events)
             for e2 in sameProcEvents:
+                if isinstance(e2, Init): continue
                 if isinstance(e1, Init) or isinstance(e2, Init): continue
                 if int(str(model[intVar('apoS',e1)])) == int(str(model[intVar('apoS', e2)])) - 1:
                     if is_true(model[edge('ppoW', e1, e2)]) and is_true(model[edge('ppoS', e1, e2)]):
                         f.write ('\te%s -> e%s [label="po", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
-                    if is_true(model[edge('ppoS', e1, e2)]) and not is_true(model[edge('ppoW', e1, e2)]):
+                    elif is_true(model[edge('ppoS', e1, e2)]):
                         f.write ('\te%s -> e%s [label="po", style=dashed, color=\"red\", fontcolor=\"red\"];\n' % (e1.eid, e2.eid))
         for m in model:
             if any (string in str(m) for string in ["rf(", "fr("]) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";"]):
                 (e1, e2, rel) = getEdge(m)
                 f.write ('\te%s -> e%s [label="%s", color=\"black\", fontcolor=\"black\"];\n' % (e1, e2, rel))
-            if any (string in str(m) for string in show) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";", "Cycle"]):
+            if any (string in str(m) for string in show) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";", "Cycle", "ff", "lw"]):
                 (e1, e2, rel) = getEdge(m)
                 f.write ('\te%s -> e%s [label="%s", color=\"blue\", fontcolor=\"blue\"];\n' % (e1, e2, rel))
             if is_true(model[m]) and all(string in str(m) for string in ["Cycle:","(",")"]):
-		(e1, e2, rel) = getEdge(m)
+		(e1, e2, rel) = getEdge(m, True)
                 f.write ('\te%s -> e%s [style=bold, color=green];\n' % (e1, e2))
         f.write ('}')
      	f.close()
 
-def getEdge(z3Bool):
+def getEdge(z3Bool, cycle=False):
     """ Transform a z3 relation variable into a tuple (e1, e2, rel). """
-    m1 = search('_\((.*?)\)', str(z3Bool))
+    if cycle:
+        m1 = search('_\((.*?)\)', str(z3Bool))
+    else:
+        m1 = search('\((.*?)\)', str(z3Bool))
     m2 = search('(.*?)\((.*)\)', str(z3Bool))
     if m1 and m2:
         split = m1.group(1).split(",",1)

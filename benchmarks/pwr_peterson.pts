@@ -1,0 +1,40 @@
+{flag1, flag2, turn}
+
+thread 0 {
+a <- 1;
+flag2 = a;
+hfence;
+turn = a;
+hfence;
+f1 <- flag1;
+hfence;
+t1 <- turn;
+hfence;
+while ((f1 == 1) and (t1 == 1)) {
+  f1 <- flag1;
+  hfence;
+  t1 <- turn
+};
+b <- 0;
+flag2 = b
+}
+
+thread 1 {
+c <- 1;
+flag1 = c;
+hfence;
+turn = c;
+hfence;
+f2 <- flag2;
+hfence;
+t2 <- turn;
+hfence;
+while ((f2 == 1) and (t2 == 1)) {
+  f2 <- flag2;
+  hfence;
+  t2 <- turn
+};
+d <- 0;
+flag1 = d
+}
+

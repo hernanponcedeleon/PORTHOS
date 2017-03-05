@@ -5,13 +5,18 @@ y1 <- 0;
 i <- 1;
 while (y1 != i) {
   x = i;
+  hfence;
   y1 <- y;
+  hfence;
   while (y1 != 0) {
     x = i;
+    hfence;
     y1 <- y
   };
   y = i;
+  hfence;
   x1 <- x;
+  hfence;
   if (x1 == i) {
     y1 <- i
   }
@@ -28,13 +33,18 @@ y1 <- 0;
 i <- 2;
 while (y1 != i) {
   x = i;
+  hfence;
   y1 <- y;
+  hfence;
   while (y1 != 0) {
     x = i;
+    hfence;
     y1 <- y
   };
   y = i;
+  hfence;
   x1 <- x;
+  hfence;
   if (x1 == i) {
     y1 <- i
   }
@@ -51,13 +61,18 @@ y1 <- 0;
 i <- 3;
 while (y1 != i) {
   x = i;
+  hfence;
   y1 <- y;
+  hfence;
   while (y1 != 0) {
     x = i;
+    hfence;
     y1 <- y
   };
   y = i;
+  hfence;
   x1 <- x;
+  hfence;
   if (x1 == i) {
     y1 <- i
   }
