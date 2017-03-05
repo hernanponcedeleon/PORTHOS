@@ -1,4 +1,4 @@
-# PORTHOS: A tool to compare the behavior of programs against different memory models
+# PORTHOS: "_One_ Tool _for all_ Models"
 
 ![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos_small.jpg)
 
