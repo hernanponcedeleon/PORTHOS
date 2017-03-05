@@ -121,9 +121,6 @@ def encodeDomain(events, barriers, eventsL):
         enc = And(enc, Implies(edge('fencePso',e1,e2), edge('fence',e1,e2)))
         enc = And(enc, Implies(edge('fenceRmo',e1,e2), edge('fence',e1,e2)))
         enc = And(enc, Implies(edge('fenceAlpha',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('mfence',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('ffence',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('lwfence',e1,e2), edge('fence',e1,e2)))
         enc = And(enc, Implies(edge('rf',e1,e2), Or(edge('rfe',e1,e2), edge('rfi',e1,e2))))
         enc = And(enc, Implies(edge('rfe',e1,e2), And(edge('rf',e1,e2), edge('ext',e1,e2))))
         enc = And(enc, Implies(edge('rfi',e1,e2), And(edge('rf',e1,e2), edge('int',e1,e2))))
@@ -153,8 +150,6 @@ def encodeDomain(events, barriers, eventsL):
     eventsB = events + barriers
 
     for e1, e2, e3 in product(eventsB, eventsB, eventsB):
-#        if isinstance(e2, Mfence) and e1.thread == e2.thread and e2.thread == e3.thread and e1.pid < e2.pid and e2.pid < e3.pid:
-#            enc = And(enc, Implies(And([Bool(ev(e1)), Bool(ev(e2)), Bool(ev(e3))]), edge('mfence',e1,e3)))
         if isinstance(e2, Sync) and e1.thread == e2.thread and e2.thread == e3.thread and e1.pid < e2.pid and e2.pid < e3.pid:
             enc = And(enc, Implies(And([Bool(ev(e1)), Bool(ev(e2)), Bool(ev(e3))]), edge('sync',e1,e3)))
         if isinstance(e2, Lwsync) and e1.thread == e2.thread and e2.thread == e3.thread and e1.pid < e2.pid and e2.pid < e3.pid:
@@ -189,12 +184,6 @@ def encodeDomain(events, barriers, eventsL):
             if e1.pid < e3.pid and e3.pid < e2.pid: nolwsync = False
         if nolwsync:
             enc = And(enc, Not(edge('lwsync',e1,e2)))
-#        nomfence = True
-#        for e3 in [e for e in barriers if isinstance(e, Mfence)]:
-#            if e3.thread != e1.thread: continue
-#            if e1.pid < e3.pid and e3.pid < e2.pid: nomfence = False
-#        if nomfence:
-#            enc = And(enc, Not(edge('mfence',e1,e2)))
 
     for e1, e2 in product(eventsL, eventsL):
         if e1.thread != e2.thread or e2.pid < e1.pid or e1 == e2:
