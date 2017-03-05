@@ -1,4 +1,4 @@
-# PORTHOS: "_One_ Tool _for all_ Models"
+# PORTHOS: _One_ Tool _for all_ Models
 
 ![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos_small.jpg)
 
