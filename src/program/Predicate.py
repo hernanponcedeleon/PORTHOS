@@ -3,6 +3,7 @@ numComparisons = ["==", "!=", "<", "<=", ">", ">=",]
 boolOperations = ["and", "or", "not"]
 
 from z3 import And, Not, Or
+from types import NoneType
 
 ### Predicate := Bool | Expression | Predicate And Predicate | Predicate Or Predicate | Not Predicate
 class Predicate:

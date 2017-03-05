@@ -10,37 +10,56 @@ from ParserAssembly import *
 from Models import *
 from z3 import *
 
+class bcolors:
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+
 def main(argv):
 
     inputfile = None
     outputfile = None
     source = None
     target = None
+    show = []
     dead = False
     verbose = False
     try:
-        opts, args = getopt.getopt(argv,"i:o:s:t:dv")
+        opts, args = getopt.getopt(argv,"p:i:os:t:dv", ["print="])
     except getopt.GetoptError:
         sys.exit(2)
     for opt, arg in opts:
         if opt == "-i":
             inputfile = arg
-        if opt == "-o":
-            outputfile = arg
+        elif opt == "-o":
+            if inputfile.endswith('.litmus'):
+                outputfile = inputfile.split("/")[-1].split(".litmus")[0]
+            else:
+                outputfile = inputfile.split(".pts")[0]
         elif opt == "-s":
             source = arg
         elif opt == "-t":
             target = arg
+        elif opt in ["-p", "--print"]:
+            show = arg.split(",")
         elif opt == "-d":
             dead = True
         elif opt == "-v":
             verbose = True
     if inputfile == None:
-	    raise Exception("No input file loaded")
+        print bcolors.FAIL + "No input file loaded." + bcolors.ENDC
+        sys.exit()
+
     if not (source in ["sc", "tso", "pso", "rmo", "alpha", "power", "cav10"]):
-        raise Exception('Source model is not valid. Select between sc, tso, pso, rmo, alpha, power, cav10')
+        print bcolors.FAIL + "Source model is not valid." + bcolors.ENDC
+        print "Select between sc, tso, pso, rmo, alpha, power, cav10"
+        sys.exit()
     if not (target in ["tso", "pso", "rmo", "alpha", "power", "cav10"]):
-        raise Exception('Target model is not valid. Select between tso, pso, rmo, alpha, power, cav10')
+        print bcolors.FAIL + "Target model is not valid." + bcolors.ENDC
+        print "Select between tso, pso, rmo, alpha, power, cav10"
+        sys.exit()
 
     if inputfile.endswith('.litmus'):
         program = parseLitmus(inputfile)
@@ -49,12 +68,13 @@ def main(argv):
         program = parsePorthosFile(inputfile)
         program.initialize()
     else:
-        raise Exception('Input is not a .litmus or .pts file')
+        print bcolors.FAIL + 'Input is not a .litmus or .pts file' + bcolors.ENDC
+        sys.exit()
 
     if verbose:
         print program
 
-    print "Checking portability between %s and %s" %(source,target)
+    print "Checking portability between %s and %s" %(bcolors.OKBLUE + source + bcolors.ENDC, bcolors.OKBLUE + target + bcolors.ENDC)
 
     if source == "sc" and target == "tso":
          (sol, model) = TSOSC(program, dead)
@@ -99,17 +119,17 @@ def main(argv):
          (sol, model) = CAVPower(program, dead)
 
     else:
-        print 'The model combination is not allowed. Plase select one combination from the paper.'
-        return
+        print bcolors.FAIL + 'The model combination is not allowed.' + bcolors.ENDC
+        sys.exit()
 
     if sol == sat:
-        print 'The program is not portable'
+        print bcolors.FAIL + 'The program is not portable' + bcolors.ENDC
     else:
-        print 'The program is portable'
+        print bcolors.OKGREEN + 'The program is portable' + bcolors.ENDC
 
-#    if outputfile != None and model != None:
-#        if verbose: print "Output written to %s.dot" %outputfile
-#        program.write('%s.dot' %outputfile, model)
+    if outputfile != None and model != None:
+        if verbose: print "Output written to %s.dot" %outputfile
+        program.write('%s.dot' %outputfile, model, map(lambda r: "%s(" %r, show))
 
     return
 

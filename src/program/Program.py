@@ -2,9 +2,9 @@ from z3 import *
 from types import *
 from copy import copy, deepcopy
 from itertools import product, combinations
-from time import time
-import random
-import collections
+#import random
+#import collections
+from re import search
 
 from ControlFlow import *
 from DataFlow import *
@@ -23,6 +23,10 @@ from Store import *
 from Thread import *
 from While import *
 
+def intVar(name, e): return Int('%s(%s)' %(name, ev(e)))
+
+def intCount(rel, e1, e2): return Int('%s(%s,%s)' %(rel, ev(e1), ev(e2)))
+
 ### Integer variable to encode that ws is a total order
 #def wsVar(e): return Int("ws:L%s(%s)" %(e.loc, ev(e)))
 
@@ -39,7 +43,7 @@ from While import *
 def edge(rel, e1, e2, arch=""): return Bool("%s%s(%s,%s)" %(rel, arch, ev(e1), ev(e2)))
 
 ### Bool variable to encode the edges of the cycle
-def cycleEdge(rel, x, y): return Bool("Cycle:%s(%s,%s)" %(rel, ev(x), ev(y)))
+def cycleEdge(rel, x, y): return Bool("Cycle:%s_(%s,%s)" %(rel, ev(x), ev(y)))
 
 ### Bool variable to encode the nodes (events) of the cycle
 def cycleVar(x): return Bool("Cycle(%s)" %(ev(x)))
@@ -62,13 +66,13 @@ def encodeEO(l):
         encoding = Or(encoding, And(rest))
     return encoding
 
-#def getEvents(t):
-#    assert(isinstance(t, Thread))
-#    if isinstance(t, Event): return [t]
-#    elif isinstance(t, Skip): return []
-#    elif isinstance(t, While): return getEvents(t.t1)
-#    elif isinstance(t, (If, Seq)): return getEvents(t.t1) + getEvents(t.t2)
-#    else: raise Exception ("Type error in getEvents")
+def getEvents(t):
+    assert(isinstance(t, Thread))
+    if isinstance(t, Event): return [t]
+    elif isinstance(t, Skip): return []
+    elif isinstance(t, While): return getEvents(t.t1)
+    elif isinstance(t, (If, Seq)): return getEvents(t.t1) + getEvents(t.t2)
+    else: raise Exception ("Type error in getEvents")
 
 class Program:
 
@@ -130,6 +134,64 @@ class Program:
             enc = And(enc, sameValues)
         return enc
 
+    def write (self, f, model, show=[], fmt='dot'):
+    	""" Write a non-portble execution into a file (DOT by default). """
+    	if isinstance (f, basestring) : f = open (f, 'w')
+        if fmt == 'dot' : return self.__write_dot (f, model, show)
+        raise Exception, "'%s': unknown output format" % fmt
+    
+    def __write_dot (self, f, model, show=[]):
+        events = filter(lambda e: not isinstance(e, (Local, Barrier)), self.events())
+    	f.write ('digraph {\n')
+        f.write ('\t/* events */\n')
+        f.write ('\tnode\t[shape=box; color=\"blue\"];\n')
+        for e in self.initEvents():
+    	    f.write ('\te%s [label="%s"];\n' % (e.eid, e))
+    	for index, p in enumerate(self.threads):
+    	    procEvents = filter(lambda e : e.thread == p.pid, events)
+    	    f.write("subgraph cluster_proc%s { ran=sink; label = \"Thread %s\"; color=magenta; shape=box;\n" % (index, index))
+            for e in procEvents:
+                if isinstance(e, Init): continue
+                f.write ('\te%s [label="%s"];\n' % (e.eid, e))
+    	    f.write("\t}\n")
+    	for e1 in self.storeEvents() + self.initEvents():
+    	    ## Finds and writes the transitive reduction of WS using the schedule imposed by wsVar
+    	    wEventsLoc = filter(lambda e : e.loc == e1.loc, self.storeEvents() + self.initEvents())
+    	    for e2 in wEventsLoc:
+                if int(str(model[intVar('ws', e1)])) == int(str(model[intVar('ws',e2)]))-1:
+                    f.write ('\te%d -> e%d [label="ws", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
+        for e1 in events:
+            sameProcEvents = filter(lambda e: e.thread == e1.thread, events)
+            for e2 in sameProcEvents:
+                if isinstance(e1, Init) or isinstance(e2, Init): continue
+                if int(str(model[intVar('apoS',e1)])) == int(str(model[intVar('apoS', e2)])) - 1:
+                    if is_true(model[edge('ppoW', e1, e2)]) and is_true(model[edge('ppoS', e1, e2)]):
+                        f.write ('\te%s -> e%s [label="po", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
+                    if is_true(model[edge('ppoS', e1, e2)]) and not is_true(model[edge('ppoW', e1, e2)]):
+                        f.write ('\te%s -> e%s [label="po", style=dashed, color=\"red\", fontcolor=\"red\"];\n' % (e1.eid, e2.eid))
+        for m in model:
+            if any (string in str(m) for string in ["rf(", "fr("]) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";"]):
+                (e1, e2, rel) = getEdge(m)
+                f.write ('\te%s -> e%s [label="%s", color=\"black\", fontcolor=\"black\"];\n' % (e1, e2, rel))
+            if any (string in str(m) for string in show) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";", "Cycle"]):
+                (e1, e2, rel) = getEdge(m)
+                f.write ('\te%s -> e%s [label="%s", color=\"blue\", fontcolor=\"blue\"];\n' % (e1, e2, rel))
+            if is_true(model[m]) and all(string in str(m) for string in ["Cycle:","(",")"]):
+		(e1, e2, rel) = getEdge(m)
+                f.write ('\te%s -> e%s [style=bold, color=green];\n' % (e1, e2))
+        f.write ('}')
+     	f.close()
+
+def getEdge(z3Bool):
+    """ Transform a z3 relation variable into a tuple (e1, e2, rel). """
+    m1 = search('_\((.*?)\)', str(z3Bool))
+    m2 = search('(.*?)\((.*)\)', str(z3Bool))
+    if m1 and m2:
+        split = m1.group(1).split(",",1)
+        rel = m2.group(1)
+        return (split[0][1:], split[1][1:], rel)
+        #return (split[0].split(":")[0][1:], split[1].split(":")[0][1:], rel)
+
 def encode(p):
     assert(isinstance(p, Program))
     ### This is the global mapping used for renaming the variables
@@ -144,52 +206,6 @@ def encode(p):
     return And(And([encodeCF(t) for t in p.threads]),
                DF, p.encodeDF_RF(), #p.encodeMM(),
                And([Bool(repr(t)) for t in  p.threads]))
-
-def randomProg(locs, regs, thrds, inst):
-
-    locsPool = []
-    for x in locs:
-        locsPool.append(Location(x))
-
-    regsPool = []
-    for x in regs:
-        regsPool.append(Register(x))
-
-    usedRegsPool = {}
-    for i in range(thrds):
-        usedRegsPool[i] = []
-
-    dic = {}
-    for t in range(thrds):
-        dic[t] = None
-
-    for i in range(inst):
-	if i < thrds: proc = i
-	else: proc = random.randrange(0, thrds)
-        if usedRegsPool[proc] != []:
-            weighted_choices = [('W', 4), ('R', 3), ('L', 2), ('B', 1)]
-        else:
-            weighted_choices = [('R', 3), ('L', 3)]
-        population = [val for val, cnt in weighted_choices for i in range(cnt)]
-        op = random.choice(population)
-        loc = random.choice(locsPool)
-        reg = random.choice(regsPool)
-	if op == "B": e = Mfence()
-        if op == "SF": e = Sync()
-        if op == "WF": e = Lwsync()
-        elif op == "W": e = Store(loc, random.choice(usedRegsPool[proc]))
-        elif op == "R": e = Load(reg, loc)
-        elif op == "L": e = Local(reg, Expression(random.choice([1,2,3,4,5])))
-        if dic[proc] == None:
-            dic[proc] = Local(reg, Expression(random.choice([1,2,3,4,5])))
-            usedRegsPool[proc].append(reg)
-        else: dic[proc] = Seq(dic[proc], e)
-
-    pr = Program()
-    for d in dic.keys():
-        pr.add(dic[d])
-
-    return pr
 
 def exportLitmus(m, name, satSolution):
     events = m.events()

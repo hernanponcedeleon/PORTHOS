@@ -1,4 +1,5 @@
 from Thread import *
+from Skip import *
 
 class If(Thread):
 
