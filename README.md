@@ -4,6 +4,7 @@
 
 Requirements
 ======
+- z3 (https://github.com/Z3Prover/z3)
 - pyparsing package (http://pyparsing.wikispaces.com)
 
 Usage
