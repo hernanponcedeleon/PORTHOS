@@ -25,7 +25,7 @@ where \<input> must be a .litmus or .pts (see below) program and \<source>, \<ta
 
 The optional -o and flags produces a .dot file showing the basic relations **rf**, **ws**, **fr** and **po** (dashed po relation shows the difference between source and target models). Additional relations can be displayed in the graph using --print=r1,r2,...,rn.
 
-The .pts format:
+The .pts format
 ======
 
 Examples are provided in the **benchmarks/** folder.
@@ -57,6 +57,6 @@ Examples are provided in the **benchmarks/** folder.
           | ⟨expr⟩ % ⟨expr⟩ 
   ```
 
-Author and Contact:
+Author and Contact
 ======
 PORTHOS is developed and maintained by Hernán Ponce de León. Please feel free to [contact me] ( mailto:ponce@fortiss.org) in case of questions or to send feedback.
