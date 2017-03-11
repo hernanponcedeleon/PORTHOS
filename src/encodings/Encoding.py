@@ -2,7 +2,10 @@ from Program import *
 from itertools import product
 from math import log
 
-def encodeDomain(events, barriers, eventsL):
+def encodeDomain(m):
+    events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
+    barriers = [e for e in m.events() if isinstance(e, Barrier)]
+    eventsL = [e for e in m.events() if not isinstance(e, Barrier)]
     enc = True
 
     for e1, e2 in product(eventsL, eventsL):
@@ -115,12 +118,17 @@ def encodeDomain(events, barriers, eventsL):
         if not (e1.thread == e2.thread and e1.pid < e2.pid):
             enc = And(enc, Not(edge('fence',e1,e2)))
             enc = And(enc, Not(edge('fenceCAV',e1,e2)))
+            enc = And(enc, Not(edge('sync',e1,e2)))
+            enc = And(enc, Not(edge('lwsync',e1,e2)))
+            enc = And(enc, Not(edge('isync',e1,e2)))
 
-        enc = And(enc, Implies(edge('fencePower',e1,e2), edge('fence',e1,e2)))
-        enc = And(enc, Implies(edge('fenceTso',e1,e2), edge('fence',e1,e2)))
-        enc = And(enc, Implies(edge('fencePso',e1,e2), edge('fence',e1,e2)))
-        enc = And(enc, Implies(edge('fenceRmo',e1,e2), edge('fence',e1,e2)))
-        enc = And(enc, Implies(edge('fenceAlpha',e1,e2), edge('fence',e1,e2)))
+
+#        enc = And(enc, Implies(edge('fence-power',e1,e2), edge('fence',e1,e2)))
+#        enc = And(enc, Implies(edge('fencePower',e1,e2), edge('fence',e1,e2)))
+#        enc = And(enc, Implies(edge('fenceTso',e1,e2), edge('fence',e1,e2)))
+#        enc = And(enc, Implies(edge('fencePso',e1,e2), edge('fence',e1,e2)))
+#        enc = And(enc, Implies(edge('fenceRmo',e1,e2), edge('fence',e1,e2)))
+#        enc = And(enc, Implies(edge('fenceAlpha',e1,e2), edge('fence',e1,e2)))
         enc = And(enc, Implies(edge('rf',e1,e2), Or(edge('rfe',e1,e2), edge('rfi',e1,e2))))
         enc = And(enc, Implies(edge('rfe',e1,e2), And(edge('rf',e1,e2), edge('ext',e1,e2))))
         enc = And(enc, Implies(edge('rfi',e1,e2), And(edge('rf',e1,e2), edge('int',e1,e2))))
@@ -133,10 +141,14 @@ def encodeDomain(events, barriers, eventsL):
         ### PO: order imposed by the order of instructions
         ### PPO: subset of PO guaranteed to be preserbed by the memory model
         ### APO: actual order performed by the memory model; should satisfy PPO
-        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('po',e1,e2)))
-        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('apoW',e1,e2)))
-        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('po',e1,e2)))
-        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('apoS',e1,e2)))
+#        enc = And(enc, Implies(edge('po-power',e1,e2), edge('po',e1,e2)))
+        enc = And(enc, Implies(edge('po-power',e1,e2), edge('apoW',e1,e2)))
+#        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('po',e1,e2)))
+#        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('apoW',e1,e2)))
+#        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('po',e1,e2)))
+        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('apoS',e1,e2)))
+#        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('po',e1,e2)))
+#        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('apoS',e1,e2)))
         enc = And(enc, Implies(edge('poloc',e1,e2), And(edge('po',e1,e2), edge('loc',e1,e2))))
         enc = And(enc, Implies(And(edge('po',e1,e2), edge('loc',e1,e2)), edge('poloc',e1,e2)))
         enc = And(enc, Implies(And(edge('(idd^+&RW)',e1,e2), And(Bool(ev(e1)), Bool(ev(e2)))), edge('data',e1,e2)))

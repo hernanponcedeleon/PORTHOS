@@ -2,13 +2,12 @@ from Encoding import *
 
 def PowerConsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
-    barriers = [e for e in m.events() if isinstance(e, Barrier)]
     eventsL = [e for e in m.events() if not isinstance(e, Barrier)]
     
     locs = list(set([e.loc for e in events if not isinstance(e, Barrier)]))
     threads = list(set([e.thread for e in events if not isinstance(e, Init)]))
-    
-    enc = encodeDomain(events, barriers, eventsL)
+
+    enc = encodeDomain(m)
     enc = And(enc, encode(m))
     
     for t in threads:
@@ -17,10 +16,9 @@ def PowerConsistent(m):
     enc = And(enc, satIntersection('idd^+', 'RW', events, 'data'))
     
     ### Fences in Power
-    enc = And(enc, satEq('sync', 'ffence', events))
-    enc = And(enc, satMinus('lwsync', 'WR', events, 'lwfence'))
-    enc = And(enc, satUnion('ffence', 'lwfence', events, 'fencePower'))
-    
+    enc = And(enc, satMinus('lwsync', 'WR', events))
+    enc = And(enc, satUnion('sync', '(lwsync\WR)', events, 'fence-power'))
+
     ### Some other relations
     enc = And(enc, satEmpty('addr', events))
     enc = And(enc, satUnion('addr', 'data', events, 'dp'))
@@ -48,18 +46,18 @@ def PowerConsistent(m):
     ### PPO for Power
     enc = And(enc, satIntersection('RR', 'ii', events))
     enc = And(enc, satIntersection('RW', 'ic', events))
-    enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'ppoW'))
+    enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'po-power'))
     
     ### Thin air check
-    enc = And(enc, satUnion('ppoW', 'rfe', events))
-    enc = And(enc, satUnion('(ppoW+rfe)', 'fencePower', events, 'hbW'))
-    enc = And(enc, satAcyclic('hbW', events))
+    enc = And(enc, satUnion('po-power', 'rfe', events))
+    enc = And(enc, satUnion('(po-power+rfe)', 'fence-power', events, 'hb-power'))
+    enc = And(enc, satAcyclic('hb-power', events))
     
     ### Prop-base
     enc = And(enc, satCompRfeFence(events))
-    enc = And(enc, satUnion('fencePower', '(rfe;fencePower)', events))
-    enc = And(enc, satTransRef('hbW', events))
-    enc = And(enc, satComp('(fencePower+(rfe;fencePower))', '(hbW)*', events, 'prop-base'))
+    enc = And(enc, satUnion('fence-power', '(rfe;fence-power)', events))
+    enc = And(enc, satTransRef('hb-power', events))
+    enc = And(enc, satComp('(fence-power+(rfe;fence-power))', '(hb-power)*', events, 'prop-base'))
     
     ### Prop for Power
     for l in locs:
@@ -68,14 +66,14 @@ def PowerConsistent(m):
     enc = And(enc, satTransRef('prop-base', events))
     enc = And(enc, satCompComProp(events))
     enc = And(enc, satCompComPropSync(events))
-    enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hbW)*', events))
+    enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hb-power)*', events))
     enc = And(enc, satIntersection('WW', 'prop-base', events))
-    enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hbW)*)', events, 'prop'))
+    enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hb-power)*)', events, 'prop'))
     
     ### Observation check
     enc = And(enc, satCompFreProp(events))
     enc = And(enc, satCompFrePropHb(events))
-    enc = And(enc, satIrref('((fre;prop);(hbW)*)', events))
+    enc = And(enc, satIrref('((fre;prop);(hb-power)*)', events))
     
     ### Propagation check
     enc = And(enc, satUnion('ws', 'prop', events))
@@ -106,9 +104,8 @@ def PowerInconsistent(m):
     enc = And(enc, satIntersection('idd^+', 'RW', events, 'data'))
     
     ### Fences in Power
-    enc = And(enc, satUnion('sync', 'ffence', events))
-    enc = And(enc, satMinus('lwsync', 'WR', events, 'lwfence'))
-    enc = And(enc, satUnion('ffence', 'lwfence', events, 'fencePower'))
+    enc = And(enc, satMinus('lwsync', 'WR', events))
+    enc = And(enc, satUnion('sync', '(lwsync\WR)', events, 'fence-power'))
     
     ### Some other relations
     enc = And(enc, satEmpty('addr', events))
@@ -137,17 +134,17 @@ def PowerInconsistent(m):
     ### PPO for Power
     enc = And(enc, satIntersection('RR', 'ii', events))
     enc = And(enc, satIntersection('RW', 'ic', events))
-    enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'ppoS'))
+    enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'po-power'))
     
     ### Thin air check
-    enc = And(enc, satUnion('ppoS', 'rfe', events))
-    enc = And(enc, satUnion('(ppoS+rfe)', 'fencePower', events, 'hbS'))
+    enc = And(enc, satUnion('po-power', 'rfe', events))
+    enc = And(enc, satUnion('(po-power+rfe)', 'fence-power', events, 'hb-power'))
     
     ### Prop-base
     enc = And(enc, satCompRfeFence(events))
-    enc = And(enc, satUnion('fencePower', '(rfe;fencePower)', events))
-    enc = And(enc, satTransRef('hbS', events))
-    enc = And(enc, satComp('(fencePower+(rfe;fencePower))', '(hbS)*', events, 'prop-base'))
+    enc = And(enc, satUnion('fence-power', '(rfe;fence-power)', events))
+    enc = And(enc, satTransRef('hb-power', events))
+    enc = And(enc, satComp('(fence-power+(rfe;fence-power))', '(hb-power)*', events, 'prop-base'))
     
     ### Prop for Power
     for l in locs:
@@ -156,9 +153,9 @@ def PowerInconsistent(m):
     enc = And(enc, satTransRef('prop-base', events))
     enc = And(enc, satCompComProp(events))
     enc = And(enc, satCompComPropSync(events))
-    enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hbS)*', events))
+    enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hb-power)*', events))
     enc = And(enc, satIntersection('WW', 'prop-base', events))
-    enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hbS)*)', events, 'prop'))
+    enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hb-power)*)', events, 'prop'))
     
     ### Observation check
     enc = And(enc, satCompFreProp(events))
@@ -173,7 +170,7 @@ def PowerInconsistent(m):
     enc = And(enc, satUnion('poloc', 'com', events))
     
     ### Axiom violation
-    enc = And(enc, Or(satCycle('hbS', events), satCycle('(ws+prop)', events), satCycle('(poloc+com)', events), satRef('((fre;prop);(hbS)*)', events)))
+    enc = And(enc, Or(satCycle('hb-power', events), satCycle('(ws+prop)', events), satCycle('(poloc+com)', events), satRef('((fre;prop);(hb-power)*)', events)))
     
     return enc
 
@@ -269,18 +266,18 @@ def satCompFrePropHb(events):
     enc = True
     for e1, e2 in product (events, events):
         if not isinstance(e1, Load): continue
-        orClause = Or([And(edge('(fre;prop)',e1,e3), edge('(hbW)*',e3,e2)) for e3 in events])
-        enc = And(enc, Implies(edge('((fre;prop);(hbW)*)',e1,e2), orClause))
-        enc= And(enc, Implies(orClause, edge('((fre;prop);(hbW)*)',e1,e2)))
+        orClause = Or([And(edge('(fre;prop)',e1,e3), edge('(hb-power)*',e3,e2)) for e3 in events])
+        enc = And(enc, Implies(edge('((fre;prop);(hb-power)*)',e1,e2), orClause))
+        enc= And(enc, Implies(orClause, edge('((fre;prop);(hb-power)*)',e1,e2)))
     return enc
 
 def satCompRfeFence(events):
     enc = True
     for e1, e2 in product (events, events):
         if not isinstance(e1, (Init, Store)): continue
-        orClause = Or([And(edge('rfe',e1,e3), edge('fencePower',e3,e2)) for e3 in events if isinstance(e3, Load) and e1.thread != e3.thread and e2.thread == e3.thread])
-        enc = And(enc, Implies(edge('(rfe;fencePower)',e1,e2), orClause))
-        enc= And(enc, Implies(orClause, edge('(rfe;fencePower)',e1,e2)))
+        orClause = Or([And(edge('rfe',e1,e3), edge('fence-power',e3,e2)) for e3 in events if isinstance(e3, Load) and e1.thread != e3.thread and e2.thread == e3.thread])
+        enc = And(enc, Implies(edge('(rfe;fence-power)',e1,e2), orClause))
+        enc= And(enc, Implies(orClause, edge('(rfe;fence-power)',e1,e2)))
     return enc
 
 def satCompFreRfe(events):
