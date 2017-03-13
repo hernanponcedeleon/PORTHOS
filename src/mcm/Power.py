@@ -1,25 +1,17 @@
 from Encoding import *
 
-def PowerConsistent(m):
+def Power(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     eventsL = [e for e in m.events() if not isinstance(e, Barrier)]
-    
     locs = list(set([e.loc for e in events if not isinstance(e, Barrier)]))
     threads = list(set([e.thread for e in events if not isinstance(e, Init)]))
 
-    enc = encodeDomain(m)
-    enc = And(enc, encode(m))
-    
+    ### Program order for Power
+    enc = True
     for t in threads:
         eventsLPerThread = [e for e in eventsL if e.thread == t]
         enc = And(enc, satTransFixPoint('idd', eventsLPerThread))
     enc = And(enc, satIntersection('idd^+', 'RW', events, 'data'))
-    
-    ### Fences in Power
-    enc = And(enc, satMinus('lwsync', 'WR', events))
-    enc = And(enc, satUnion('sync', '(lwsync\WR)', events, 'fence-power'))
-
-    ### Some other relations
     enc = And(enc, satEmpty('addr', events))
     enc = And(enc, satUnion('addr', 'data', events, 'dp'))
     for l in locs:
@@ -29,7 +21,7 @@ def PowerConsistent(m):
     enc = And(enc, satIntersection('poloc', '(fre;rfe)', events, 'rdw'))
     enc = And(enc, satIntersection('poloc', '(wse;rfe)', events, 'detour'))
     
-    ### Base case for the recursion
+    ### Base case for program order
     enc = And(enc, satUnion('dp', 'rdw', events))
     enc = And(enc, satUnion('(dp+rdw)', 'rfi', events, 'ii0'))
     enc = And(enc, satEmpty('ic0', events))
@@ -39,19 +31,21 @@ def PowerConsistent(m):
     for t in threads:
         eventsPerThread = [e for e in events if e.thread == t]
         enc = And(enc, satComp('addr', 'po', eventsPerThread))
-        ### Recursive
+        ### Recursive case for program order
         enc = And(enc, satPowerPPO(eventsPerThread))
     enc = And(enc, satUnion('((dp+poloc)+ctrl)', '(addr;po)', events, 'cc0'))
-    
-    ### PPO for Power
+
     enc = And(enc, satIntersection('RR', 'ii', events))
     enc = And(enc, satIntersection('RW', 'ic', events))
     enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'po-power'))
-    
-    ### Thin air check
+
+    ### Fences in Power
+    enc = And(enc, satMinus('lwsync', 'WR', events))
+    enc = And(enc, satUnion('sync', '(lwsync\WR)', events, 'fence-power'))
+
+    ### Happens before
     enc = And(enc, satUnion('po-power', 'rfe', events))
     enc = And(enc, satUnion('(po-power+rfe)', 'fence-power', events, 'hb-power'))
-    enc = And(enc, satAcyclic('hb-power', events))
     
     ### Prop-base
     enc = And(enc, satCompRfeFence(events))
@@ -59,7 +53,7 @@ def PowerConsistent(m):
     enc = And(enc, satTransRef('hb-power', events))
     enc = And(enc, satComp('(fence-power+(rfe;fence-power))', '(hb-power)*', events, 'prop-base'))
     
-    ### Prop for Power
+    ### Propagation for Power
     for l in locs:
         eventsPerLoc = [e for e in events if e.loc == l]
         enc = And(enc, satTransRef('com', eventsPerLoc))
@@ -69,110 +63,26 @@ def PowerConsistent(m):
     enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hb-power)*', events))
     enc = And(enc, satIntersection('WW', 'prop-base', events))
     enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hb-power)*)', events, 'prop'))
-    
-    ### Observation check
     enc = And(enc, satCompFreProp(events))
     enc = And(enc, satCompFrePropHb(events))
-    enc = And(enc, satIrref('((fre;prop);(hb-power)*)', events))
-    
-    ### Propagation check
     enc = And(enc, satUnion('ws', 'prop', events))
-    enc = And(enc, satAcyclic('(ws+prop)', events))
     
-    ### SC per location
+    ### Uniproc
     enc = And(enc, satUnion('ws', 'fr', events))
     enc = And(enc, satUnion('(ws+fr)', 'rf', events, 'com'))
     enc = And(enc, satUnion('poloc', 'com', events))
-    enc = And(enc, satAcyclic('(poloc+com)', events))
     
     return enc
+
+def PowerConsistent(m):
+    events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
+
+    return And(satAcyclic('hb-power', events), satIrref('((fre;prop);(hb-power)*)', events), satAcyclic('(ws+prop)', events), satAcyclic('(poloc+com)', events))
 
 def PowerInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
-    barriers = [e for e in m.events() if isinstance(e, Barrier)]
-    eventsL = [e for e in m.events() if not isinstance(e, Barrier)]
-    
-    locs = list(set([e.loc for e in events if not isinstance(e, Barrier)]))
-    threads = list(set([e.thread for e in events if not isinstance(e, Init)]))
-    
-    enc = encodeDomain(events, barriers, eventsL)
-    enc = And(enc, encode(m))
-    
-    for t in threads:
-        eventsLPerThread = [e for e in eventsL if e.thread == t]
-        enc = And(enc, satTransFixPoint('idd', eventsLPerThread))
-    enc = And(enc, satIntersection('idd^+', 'RW', events, 'data'))
-    
-    ### Fences in Power
-    enc = And(enc, satMinus('lwsync', 'WR', events))
-    enc = And(enc, satUnion('sync', '(lwsync\WR)', events, 'fence-power'))
-    
-    ### Some other relations
-    enc = And(enc, satEmpty('addr', events))
-    enc = And(enc, satUnion('addr', 'data', events, 'dp'))
-    for l in locs:
-        eventsPerLoc = [e for e in events if e.loc == l]
-        enc = And(enc, satCompFreRfe(eventsPerLoc))
-        enc = And(enc, satCompWseRfe(eventsPerLoc))
-    enc = And(enc, satIntersection('poloc', '(fre;rfe)', events, 'rdw'))
-    enc = And(enc, satIntersection('poloc', '(wse;rfe)', events, 'detour'))
-    
-    ### Base case for the recursion
-    enc = And(enc, satUnion('dp', 'rdw', events))
-    enc = And(enc, satUnion('(dp+rdw)', 'rfi', events, 'ii0'))
-    enc = And(enc, satEmpty('ic0', events))
-    enc = And(enc, satUnion('ctrlisync', 'detour', events, 'ci0'))
-    enc = And(enc, satUnion('dp', 'poloc', events))
-    enc = And(enc, satUnion('(dp+poloc)', 'ctrl', events))
-    for t in threads:
-        eventsPerThread = [e for e in events if e.thread == t]
-        enc = And(enc, satComp('addr', 'po', eventsPerThread))
-        ### Recursive
-        enc = And(enc, satPowerPPO(eventsPerThread))
-    enc = And(enc, satUnion('((dp+poloc)+ctrl)', '(addr;po)', events, 'cc0'))
-    
-    ### PPO for Power
-    enc = And(enc, satIntersection('RR', 'ii', events))
-    enc = And(enc, satIntersection('RW', 'ic', events))
-    enc = And(enc, satUnion('(RR&ii)', '(RW&ic)', events, 'po-power'))
-    
-    ### Thin air check
-    enc = And(enc, satUnion('po-power', 'rfe', events))
-    enc = And(enc, satUnion('(po-power+rfe)', 'fence-power', events, 'hb-power'))
-    
-    ### Prop-base
-    enc = And(enc, satCompRfeFence(events))
-    enc = And(enc, satUnion('fence-power', '(rfe;fence-power)', events))
-    enc = And(enc, satTransRef('hb-power', events))
-    enc = And(enc, satComp('(fence-power+(rfe;fence-power))', '(hb-power)*', events, 'prop-base'))
-    
-    ### Prop for Power
-    for l in locs:
-        eventsPerLoc = [e for e in events if e.loc == l]
-        enc = And(enc, satTransRef('com', eventsPerLoc))
-    enc = And(enc, satTransRef('prop-base', events))
-    enc = And(enc, satCompComProp(events))
-    enc = And(enc, satCompComPropSync(events))
-    enc = And(enc, satComp('(((com)*;(prop-base)*);sync)', '(hb-power)*', events))
-    enc = And(enc, satIntersection('WW', 'prop-base', events))
-    enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hb-power)*)', events, 'prop'))
-    
-    ### Observation check
-    enc = And(enc, satCompFreProp(events))
-    enc = And(enc, satCompFrePropHb(events))
-    
-    ### Propagation check
-    enc = And(enc, satUnion('ws', 'prop', events))
-    
-    ### SC per location
-    enc = And(enc, satUnion('ws', 'fr', events))
-    enc = And(enc, satUnion('(ws+fr)', 'rf', events, 'com'))
-    enc = And(enc, satUnion('poloc', 'com', events))
-    
-    ### Axiom violation
-    enc = And(enc, Or(satCycle('hb-power', events), satCycle('(ws+prop)', events), satCycle('(poloc+com)', events), satRef('((fre;prop);(hb-power)*)', events)))
-    
-    return enc
+
+    return Or(satCycle('hb-power', events), satRef('((fre;prop);(hb-power)*)', events), satCycle('(ws+prop)', events), satCycle('(poloc+com)', events))
 
 def satPowerPPO(events):
     enc = True

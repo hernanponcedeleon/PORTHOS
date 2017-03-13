@@ -16,7 +16,7 @@ def encodeDomain(m):
             enc = And(enc, Not(edge('cc',e1,e2)))
 
     for e1, e2 in product(events, events):
-        for rel in ['ws', 'rf', 'fr', 'apo', 'fence', 'data']:
+        for rel in ['ws', 'rf', 'fr']:
             enc = And(enc, Implies(edge(rel, e1, e2), And(Bool(ev(e1)), Bool(ev(e2)))))
         if not isinstance(e1, Init):
             enc = And(enc, Not(edge('IM',e1,e2)))
@@ -77,7 +77,6 @@ def encodeDomain(m):
             enc = And(enc, Not(edge('ext',e1,e2)))
             if e1.pid < e2.pid:
                 enc = And(enc, edge('po',e1,e2))
-                ##if e1.condLevel < e2.condLevel and isinstance(e1, (Local, Load, Init, Store)) and isinstance(e2, (Local, Load, Init, Store)) and e1.reg in e2.condReg:
                 ## CTRL can only originate on a read
                 if e1.condLevel < e2.condLevel and isinstance(e1, Load) and isinstance(e2, (Local, Load, Init, Store)) and e1.reg in e2.condReg:
                     enc = And(enc, edge('ctrl',e1,e2))
@@ -116,19 +115,10 @@ def encodeDomain(m):
         if not (isinstance(e1, Load) and isinstance(e2, (Store, Init)) and e1.loc == e2.loc):
             enc = And(enc, Not(edge('fr',e1,e2)))
         if not (e1.thread == e2.thread and e1.pid < e2.pid):
-            enc = And(enc, Not(edge('fence',e1,e2)))
-            enc = And(enc, Not(edge('fenceCAV',e1,e2)))
             enc = And(enc, Not(edge('sync',e1,e2)))
             enc = And(enc, Not(edge('lwsync',e1,e2)))
             enc = And(enc, Not(edge('isync',e1,e2)))
 
-
-#        enc = And(enc, Implies(edge('fence-power',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('fencePower',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('fenceTso',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('fencePso',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('fenceRmo',e1,e2), edge('fence',e1,e2)))
-#        enc = And(enc, Implies(edge('fenceAlpha',e1,e2), edge('fence',e1,e2)))
         enc = And(enc, Implies(edge('rf',e1,e2), Or(edge('rfe',e1,e2), edge('rfi',e1,e2))))
         enc = And(enc, Implies(edge('rfe',e1,e2), And(edge('rf',e1,e2), edge('ext',e1,e2))))
         enc = And(enc, Implies(edge('rfi',e1,e2), And(edge('rf',e1,e2), edge('int',e1,e2))))
@@ -141,14 +131,8 @@ def encodeDomain(m):
         ### PO: order imposed by the order of instructions
         ### PPO: subset of PO guaranteed to be preserbed by the memory model
         ### APO: actual order performed by the memory model; should satisfy PPO
-#        enc = And(enc, Implies(edge('po-power',e1,e2), edge('po',e1,e2)))
-        enc = And(enc, Implies(edge('po-power',e1,e2), edge('apoW',e1,e2)))
-#        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('po',e1,e2)))
-#        enc = And(enc, Implies(edge('ppoW',e1,e2), edge('apoW',e1,e2)))
-#        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('po',e1,e2)))
-        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('apoS',e1,e2)))
-#        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('po',e1,e2)))
-#        enc = And(enc, Implies(edge('ppoS',e1,e2), edge('apoS',e1,e2)))
+#        enc = And(enc, Implies(edge('po-power',e1,e2), edge('apoW',e1,e2)))
+#        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('apoS',e1,e2)))
         enc = And(enc, Implies(edge('poloc',e1,e2), And(edge('po',e1,e2), edge('loc',e1,e2))))
         enc = And(enc, Implies(And(edge('po',e1,e2), edge('loc',e1,e2)), edge('poloc',e1,e2)))
         enc = And(enc, Implies(And(edge('(idd^+&RW)',e1,e2), And(Bool(ev(e1)), Bool(ev(e2)))), edge('data',e1,e2)))
@@ -171,13 +155,6 @@ def encodeDomain(m):
 
     for e1, e2 in product(events, events):
         if e1.thread != e2.thread: continue
-        nofence = True
-        for e3 in barriers:
-            if e3.thread != e1.thread: continue
-            if e1.pid < e3.pid and e3.pid < e2.pid: nofence = False
-        if nofence:
-            enc = And(enc, Not(edge('fence',e1,e2)))
-            enc = And(enc, Not(edge('fenceCAV',e1,e2)))
         nosync = True
         for e3 in [e for e in barriers if isinstance(e, Sync)]:
             if e3.thread != e1.thread: continue
@@ -200,7 +177,6 @@ def encodeDomain(m):
     for e1, e2 in product(eventsL, eventsL):
         if e1.thread != e2.thread or e2.pid < e1.pid or e1 == e2:
             enc = And(enc, Not(edge('idd',e1,e2)))
-#            enc = And(enc, Not(edge('idd^+',e1,e2)))
         if isinstance(e2, Store):
             lastMod = e2.getMapLastMod()[e2.reg]
             if not e1 in lastMod:
@@ -242,10 +218,10 @@ def encodeDomain(m):
         pairs = map(lambda w: edge('rf',w,e), events)
         enc = And(enc, Implies(Bool(ev(e)), encodeEO(pairs)))
 
-    for t in threads:
-        eventsThread = filter(lambda e: e.thread == t, events)
-        enc = And(enc, satTO('apoW', eventsThread))
-        enc = And(enc, satTO('apoS', eventsThread))
+#    for t in threads:
+#        eventsThread = filter(lambda e: e.thread == t, events)
+#        enc = And(enc, satTO('apoW', eventsThread))
+#        enc = And(enc, satTO('apoS', eventsThread))
 
     return enc
 

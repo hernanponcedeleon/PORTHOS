@@ -1,3 +1,4 @@
+import sys
 from SC import *
 from TSO import *
 from PSO import *
@@ -7,231 +8,69 @@ from Power import *
 from Dead import *
 from CAV10 import *
 
-def PowerSC(m, dead=False, write=False):
+class bcolors:
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
 
+def portability(m, source, target, dead=False):
     s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(ScInconsistent(m))
-    if dead:
-        s.add(Dead(m))
 
-    res = s.check()
+    s.add(encodeDomain(m))
+    s.add(encode(m))
+
+    if source == "sc":
+        s.add(Sc(m))
+        s.add(ScInconsistent(m))
+    elif source == "tso":
+        s.add(Tso(m))
+        s.add(TsoInconsistent(m))
+    elif source == "pso":
+        s.add(Pso(m))
+        s.add(PsoInconsistent(m))
+    elif source == "rmo":
+        s.add(Rmo(m))
+        s.add(RmoInconsistent(m))
+    elif source == "alpha":
+        s.add(Alpha(m))
+        s.add(AlphaInconsistent(m))
+    elif source == "power":
+        s.add(Power(m))
+        s.add(PowerInconsistent(m))
+    elif source == "cav10":
+        s.add(Cav(m))
+        s.add(CavInconsistent(m))
+    else:
+        print bcolors.FAIL + 'The source model is not supported.' + bcolors.ENDC
+        sys.exit()
+
+    if target == "sc":
+        s.add(Sc(m))
+        s.add(ScConsistent(m))
+    elif target == "tso":
+        s.add(Tso(m))
+        s.add(TsoConsistent(m))
+    elif target == "pso":
+        s.add(Pso(m))
+        s.add(PsoConsistent(m))
+    elif target == "rmo":
+        s.add(Rmo(m))
+        s.add(RmoConsistent(m))
+    elif target == "alpha":
+        s.add(Alpha(m))
+        s.add(AlphaConsistent(m))
+    elif target == "power":
+        s.add(Power(m))
+        s.add(PowerConsistent(m))
+    elif target == "cav10":
+        s.add(Cav(m))
+        s.add(CavConsistent(m))
+    else:
+        print bcolors.FAIL + 'The target model is not supported.' + bcolors.ENDC
+        sys.exit()
 
-    return (res, s.model() if res == sat else None)
-
-def PowerTSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(TsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PowerPSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(PsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PowerRMO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(RmoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PowerAlpha(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(AlphaInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PowerCAV(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PowerConsistent(m))
-    s.add(CavInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def CAVPower(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(CavConsistent(m))
-    s.add(PowerInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def AlphaSC(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(AlphaConsistent(m))
-    s.add(ScInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def AlphaTSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(AlphaConsistent(m))
-    s.add(TsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def AlphaPSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(AlphaConsistent(m))
-    s.add(PsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def AlphaRMO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(AlphaConsistent(m))
-    s.add(RmoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def RMOSC(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(RmoConsistent(m))
-    s.add(ScInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def RMOTSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(RmoConsistent(m))
-    s.add(TsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def RMOPSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(RmoConsistent(m))
-    s.add(PsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def RMOAlpha(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(RmoConsistent(m))
-    s.add(AlphaInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PSOSC(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PsoConsistent(m))
-    s.add(ScInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def PSOTSO(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(PsoConsistent(m))
-    s.add(TsoInconsistent(m))
-    if dead:
-        s.add(Dead(m))
-
-    res = s.check()
-
-    return (res, s.model() if res == sat else None)
-
-
-def TSOSC(m, dead=False, write=False):
-
-    s = Solver()
-    s.add(TsoConsistent(m))
-    s.add(ScInconsistent(m))
     if dead:
         s.add(Dead(m))
 

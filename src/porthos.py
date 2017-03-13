@@ -52,15 +52,6 @@ def main(argv):
         print bcolors.FAIL + "No input file loaded." + bcolors.ENDC
         sys.exit()
 
-    if not (source in ["sc", "tso", "pso", "rmo", "alpha", "power", "cav10"]):
-        print bcolors.FAIL + "Source model is not valid." + bcolors.ENDC
-        print "Select between sc, tso, pso, rmo, alpha, power, cav10"
-        sys.exit()
-    if not (target in ["tso", "pso", "rmo", "alpha", "power", "cav10"]):
-        print bcolors.FAIL + "Target model is not valid." + bcolors.ENDC
-        print "Select between tso, pso, rmo, alpha, power, cav10"
-        sys.exit()
-
     if inputfile.endswith('.litmus'):
         program = parseLitmus(inputfile)
         ### The parser already creates the initial writes, so no need to initialize
@@ -76,51 +67,7 @@ def main(argv):
 
     print "Checking portability between %s and %s" %(bcolors.OKBLUE + source + bcolors.ENDC, bcolors.OKBLUE + target + bcolors.ENDC)
 
-    if source == "sc" and target == "tso":
-         (sol, model) = TSOSC(program, dead)
-    elif source == "sc" and target == "pso":
-         (sol, model) = PSOSC(program, dead)
-    elif source == "sc" and target == "rmo":
-         (sol, model) = RMOSC(program, dead)
-    elif source == "sc" and target == "alpha":
-         (sol, model) = AlphaSC(program, dead)
-    elif source == "sc" and target == "power":
-         (sol, model) = PowerSC(program, dead)
-
-    elif source == "tso" and target == "pso":
-         (sol, model) = PSOTSO(program, dead)
-    elif source == "tso" and target == "rmo":
-         (sol, model) = RMOTSO(program, dead)
-    elif source == "tso" and target == "alpha":
-         (sol, model) = AlphaTSO(program, dead)
-    elif source == "tso" and target == "power":
-         (sol, model) = PowerTSO(program, dead)
-
-    elif source == "pso" and target == "rmo":
-         (sol, model) = RMOPSO(program, dead)
-    elif source == "pso" and target == "alpha":
-         (sol, model) = AlphaPSO(program, dead)
-    elif source == "pso" and target == "power":
-         (sol, model) = PowerPSO(program, dead)
-
-    elif source == "rmo" and target == "alpha":
-         (sol, model) = AlphaRMO(program, dead)
-    elif source == "rmo" and target == "power":
-         (sol, model) = PowerRMO(program, dead)
-
-    elif source == "alpha" and target == "rmo":
-         (sol, model) = RMOAlpha(program, dead)
-    elif source == "alpha" and target == "power":
-         (sol, model) = PowerAlpha(program, dead)
-
-    elif source == "cav10" and target == "power":
-         (sol, model) = PowerCAV(program, dead)
-    elif source == "power" and target == "cav10":
-         (sol, model) = CAVPower(program, dead)
-
-    else:
-        print bcolors.FAIL + 'The model combination is not allowed.' + bcolors.ENDC
-        sys.exit()
+    (sol, model) = portability(program, source, target, dead)
 
     if sol == sat:
         print bcolors.FAIL + 'The program is not portable' + bcolors.ENDC
