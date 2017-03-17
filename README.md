@@ -59,4 +59,4 @@ Examples are provided in the **benchmarks/** folder.
 
 Author and Contact
 ======
-PORTHOS is developed and maintained by Hernán Ponce de León. Please feel free to [contact me] ( mailto:ponce@fortiss.org) in case of questions or to send feedback.
+PORTHOS is developed and maintained by Hernán Ponce de León. Please feel free to [contact me]( mailto:ponce@fortiss.org) in case of questions or to send feedback.
