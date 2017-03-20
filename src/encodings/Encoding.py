@@ -131,8 +131,6 @@ def encodeDomain(m):
         ### PO: order imposed by the order of instructions
         ### PPO: subset of PO guaranteed to be preserbed by the memory model
         ### APO: actual order performed by the memory model; should satisfy PPO
-#        enc = And(enc, Implies(edge('po-power',e1,e2), edge('apoW',e1,e2)))
-#        enc = And(enc, Implies(edge('po-tso',e1,e2), edge('apoS',e1,e2)))
         enc = And(enc, Implies(edge('poloc',e1,e2), And(edge('po',e1,e2), edge('loc',e1,e2))))
         enc = And(enc, Implies(And(edge('po',e1,e2), edge('loc',e1,e2)), edge('poloc',e1,e2)))
         enc = And(enc, Implies(And(edge('(idd^+&RW)',e1,e2), And(Bool(ev(e1)), Bool(ev(e2)))), edge('data',e1,e2)))
@@ -218,11 +216,6 @@ def encodeDomain(m):
         pairs = map(lambda w: edge('rf',w,e), events)
         enc = And(enc, Implies(Bool(ev(e)), encodeEO(pairs)))
 
-#    for t in threads:
-#        eventsThread = filter(lambda e: e.thread == t, events)
-#        enc = And(enc, satTO('apoW', eventsThread))
-#        enc = And(enc, satTO('apoS', eventsThread))
-
     return enc
 
 def satEmpty(rel, events):
@@ -248,25 +241,15 @@ def satCycle(rel, events):
 def satTransFixPoint(rel, events):
     enc = True
     for e1,e2 in product(events, events):
-        if e1 == e2: enc = And(enc, edge('%s0' %rel,e1,e2))
-        else:
-            enc = And(enc, Implies(edge('%s0' %rel,e1,e2), edge(rel,e1,e2)))
-            enc = And(enc, Implies(edge(rel,e1,e2), edge('%s0' %rel,e1,e2)))
+        enc = And(enc, edge('%s0' %rel,e1,e2) == edge(rel,e1,e2))
+        enc = And(enc, edge('%s^+' %rel,e1,e2) == edge('%s%s' %(rel,int(log(len(events), 2)) + 1),e1,e2))
 
     for i in range(int(log(len(events), 2)) + 1):
         for e1, e2 in product(events, events):
             orClause = False
             for e3 in events:
                 orClause = Or(orClause, And(edge('%s%s' %(rel,i),e1,e3), edge('%s%s' %(rel,i),e3,e2)))
-            enc = And(enc, Implies(edge('%s%s' %(rel,i+1),e1,e2), orClause))
-            enc = And(enc, Implies(orClause, edge('%s%s' %(rel,i+1),e1,e2)))
-
-    for e1, e2 in product(events, events):
-        enc = And(enc, edge('%s_plus' %rel,e1,e2) == edge('%s%s' %(rel,int(log(len(events), 2)) + 1),e1,e2))
-        if e1 == e2:
-            enc = And(enc, Not(edge('%s^+',e1,e2)))
-        else:
-            enc = And(enc, edge('%s^+' %rel,e1,e2) == edge('%s_plus' %rel,e1,e2))
+            enc = And(enc, edge('%s%s' %(rel,i+1),e1,e2) == Or(edge(rel,e1,e2), orClause))
     return enc
 
 def satTrans(rel, events):
@@ -291,22 +274,18 @@ def satTransRef(rel, events):
 
 def satTransRefFixPoint(rel, events):
     enc = True
+    enc = True
     for e1,e2 in product(events, events):
-        if e1 == e2: enc = And(enc, edge('%s0' %rel,e1,e2))
-        else:
-            enc = And(enc, Implies(edge('%s0' %rel,e1,e2), edge(rel,e1,e2)))
-            enc = And(enc, Implies(edge(rel,e1,e2), edge('%s0' %rel,e1,e2)))
-
+        enc = And(enc, edge('%s0' %rel,e1,e2) == edge(rel,e1,e2))
+        enc = And(enc, edge('%s^+' %rel,e1,e2) == edge('%s%s' %(rel,int(log(len(events), 2)) + 1),e1,e2))
+        enc = And(enc, edge('(%s)*' %rel,e1,e2) == Or(edge('%s^+' %rel,e1,e2), edge('id' %rel,e1,e2)))
+    
     for i in range(int(log(len(events), 2)) + 1):
         for e1, e2 in product(events, events):
             orClause = False
             for e3 in events:
                 orClause = Or(orClause, And(edge('%s%s' %(rel,i),e1,e3), edge('%s%s' %(rel,i),e3,e2)))
-            enc = And(enc, Implies(edge('%s%s' %(rel,i+1),e1,e2), orClause))
-            enc = And(enc, Implies(orClause, edge('%s%s' %(rel,i+1),e1,e2)))
-
-    for e1, e2 in product(events, events):
-        enc = And(enc, edge('(%s)*' %rel,e1,e2) == edge('%s%s' %(rel,int(log(len(events), 2)) + 1),e1,e2))
+            enc = And(enc, edge('%s%s' %(rel,i+1),e1,e2) == Or(edge(rel,e1,e2), orClause))
     return enc
 
 def satIrref(rel, events):
