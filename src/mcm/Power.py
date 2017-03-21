@@ -17,9 +17,9 @@ def Power(m):
     for l in locs:
         eventsPerLoc = [e for e in events if e.loc == l]
         enc = And(enc, satCompFreRfe(eventsPerLoc))
-        enc = And(enc, satCompWseRfe(eventsPerLoc))
+        enc = And(enc, satCompCoeRfe(eventsPerLoc))
     enc = And(enc, satIntersection('poloc', '(fre;rfe)', events, 'rdw'))
-    enc = And(enc, satIntersection('poloc', '(wse;rfe)', events, 'detour'))
+    enc = And(enc, satIntersection('poloc', '(coe;rfe)', events, 'detour'))
     
     ### Base case for program order
     enc = And(enc, satUnion('dp', 'rdw', events))
@@ -65,11 +65,11 @@ def Power(m):
     enc = And(enc, satUnion('(WW&prop-base)', '((((com)*;(prop-base)*);sync);(hb-power)*)', events, 'prop'))
     enc = And(enc, satCompFreProp(events))
     enc = And(enc, satCompFrePropHb(events))
-    enc = And(enc, satUnion('ws', 'prop', events))
+    enc = And(enc, satUnion('co', 'prop', events))
     
     ### Uniproc
-    enc = And(enc, satUnion('ws', 'fr', events))
-    enc = And(enc, satUnion('(ws+fr)', 'rf', events, 'com'))
+    enc = And(enc, satUnion('co', 'fr', events))
+    enc = And(enc, satUnion('(co+fr)', 'rf', events, 'com'))
     enc = And(enc, satUnion('poloc', 'com', events))
     
     return enc
@@ -77,12 +77,12 @@ def Power(m):
 def PowerConsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
 
-    return And(satAcyclic('hb-power', events), satIrref('((fre;prop);(hb-power)*)', events), satAcyclic('(ws+prop)', events), satAcyclic('(poloc+com)', events))
+    return And(satAcyclic('hb-power', events), satIrref('((fre;prop);(hb-power)*)', events), satAcyclic('(co+prop)', events), satAcyclic('(poloc+com)', events))
 
 def PowerInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
 
-    return Or(satCycle('hb-power', events), satRef('((fre;prop);(hb-power)*)', events), satCycle('(ws+prop)', events), satCycle('(poloc+com)', events))
+    return Or(satCycle('hb-power', events), satRef('((fre;prop);(hb-power)*)', events), satCycle('(co+prop)', events), satCycle('(poloc+com)', events))
 
 def satPowerPPO(events):
     enc = True
@@ -199,11 +199,11 @@ def satCompFreRfe(events):
         enc= And(enc, Implies(orClause, edge('(fre;fre)',e1,e2)))
     return enc
 
-def satCompWseRfe(events):
+def satCompCoeRfe(events):
     enc = True
     for e1, e2 in product (events, events):
         if not isinstance(e1, (Init, Store)) or not isinstance(e1, Load): continue
-        orClause = Or([And(edge('wse',e1,e3), edge('rfe',e3,e2)) for e3 in events if isinstance(e3, (Init, Store)) and e1.thread != e3.thread and e2.thread != e3.thread and e1.loc == e3.loc and e2.loc == e3.loc])
-        enc = And(enc, Implies(edge('(wse;rfe)',e1,e2), orClause))
-        enc= And(enc, Implies(orClause, edge('(wse;fre)',e1,e2)))
+        orClause = Or([And(edge('coe',e1,e3), edge('rfe',e3,e2)) for e3 in events if isinstance(e3, (Init, Store)) and e1.thread != e3.thread and e2.thread != e3.thread and e1.loc == e3.loc and e2.loc == e3.loc])
+        enc = And(enc, Implies(edge('(coe;rfe)',e1,e2), orClause))
+        enc= And(enc, Implies(orClause, edge('(coe;fre)',e1,e2)))
     return enc

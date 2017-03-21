@@ -16,7 +16,7 @@ def encodeDomain(m):
             enc = And(enc, Not(edge('cc',e1,e2)))
 
     for e1, e2 in product(events, events):
-        for rel in ['ws', 'rf', 'fr']:
+        for rel in ['co', 'rf', 'fr']:
             enc = And(enc, Implies(edge(rel, e1, e2), And(Bool(ev(e1)), Bool(ev(e2)))))
         if not isinstance(e1, Init):
             enc = And(enc, Not(edge('IM',e1,e2)))
@@ -111,7 +111,7 @@ def encodeDomain(m):
         if not (isinstance(e1, (Store, Init)) and isinstance(e2, Load) and e1.loc == e2.loc):
             enc = And(enc, Not(edge('rf',e1,e2)))
         if not (isinstance(e1, (Store, Init)) and isinstance(e2, (Store, Init)) and e1.loc == e2.loc):
-            enc = And(enc, Not(edge('ws',e1,e2)))
+            enc = And(enc, Not(edge('co',e1,e2)))
         if not (isinstance(e1, Load) and isinstance(e2, (Store, Init)) and e1.loc == e2.loc):
             enc = And(enc, Not(edge('fr',e1,e2)))
         if not (e1.thread == e2.thread and e1.pid < e2.pid):
@@ -122,9 +122,9 @@ def encodeDomain(m):
         enc = And(enc, Implies(edge('rf',e1,e2), Or(edge('rfe',e1,e2), edge('rfi',e1,e2))))
         enc = And(enc, Implies(edge('rfe',e1,e2), And(edge('rf',e1,e2), edge('ext',e1,e2))))
         enc = And(enc, Implies(edge('rfi',e1,e2), And(edge('rf',e1,e2), edge('int',e1,e2))))
-        enc = And(enc, Implies(edge('ws',e1,e2), Or(edge('wse',e1,e2), edge('wsi',e1,e2))))
-        enc = And(enc, Implies(edge('wse',e1,e2), And(edge('ws',e1,e2), edge('ext',e1,e2))))
-        enc = And(enc, Implies(edge('wsi',e1,e2), And(edge('ws',e1,e2), edge('int',e1,e2))))
+        enc = And(enc, Implies(edge('co',e1,e2), Or(edge('coe',e1,e2), edge('coi',e1,e2))))
+        enc = And(enc, Implies(edge('coe',e1,e2), And(edge('co',e1,e2), edge('ext',e1,e2))))
+        enc = And(enc, Implies(edge('coi',e1,e2), And(edge('co',e1,e2), edge('int',e1,e2))))
         enc = And(enc, Implies(edge('fr',e1,e2), Or(edge('fre',e1,e2), edge('fri',e1,e2))))
         enc = And(enc, Implies(edge('fre',e1,e2), And(edge('fr',e1,e2), edge('ext',e1,e2))))
         enc = And(enc, Implies(edge('fri',e1,e2), And(edge('fr',e1,e2), edge('int',e1,e2))))
@@ -198,18 +198,18 @@ def encodeDomain(m):
                 lastMod = e.getMapLastMod()[r]
                 enc = And(enc, Or(map(lambda x: edge('idd',x,e), lastMod)))
 
-    ### FR is defined in terms of WS and RF
+    ### FR is defined in terms of CO and RF
     for e1 in events:
         for e2, e3 in product(events, events):
-                enc = And(enc, Implies(And(edge('rf', e3, e1), edge('ws', e3, e2)), edge('fr', e1, e2)))
+                enc = And(enc, Implies(And(edge('rf', e3, e1), edge('co', e3, e2)), edge('fr', e1, e2)))
 
     for l in locs:
-        ### WS is a total order per location
+        ### CO is a total order per location
         writeEventsLoc = [e for e in events if isinstance(e, (Store, Init)) and e.loc == l]
-        enc = And(enc, satTO('ws', writeEventsLoc))
+        enc = And(enc, satTO('co', writeEventsLoc))
 
-    ### Init events are the first one in the WS total order
-    enc = And(enc, And([intVar('ws', e) == 1 for e in events if isinstance(e, Init)]))
+    ### Init events are the first one in the CO total order
+    enc = And(enc, And([intVar('co', e) == 1 for e in events if isinstance(e, Init)]))
 
     ### each Load RF exactly one write event
     for e in filter(lambda e: isinstance(e, Load), events):

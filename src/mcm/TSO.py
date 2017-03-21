@@ -4,14 +4,14 @@ def Tso(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
 
     ### All communication relations
-    enc = satUnion('ws', 'fr', events)
-    enc = And(enc, satUnion('(ws+fr)', 'rf', events, 'com'))
+    enc = satUnion('co', 'fr', events)
+    enc = And(enc, satUnion('(co+fr)', 'rf', events, 'com'))
 
     ### Uniproc
     enc = And(enc, satUnion('poloc', 'com', events))
     
     ### Communication relations for TSO
-    enc = And(enc, satUnion('(ws+fr)', 'rfe', events, 'com-tso'))
+    enc = And(enc, satUnion('(co+fr)', 'rfe', events, 'com-tso'))
 
     ### Program order for TSO
     enc = And(enc, satMinus('po', 'WR', events))
