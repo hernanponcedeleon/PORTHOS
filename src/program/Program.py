@@ -32,7 +32,7 @@ def edge(rel, e1, e2, arch=""): return Bool("%s%s(%s,%s)" %(rel, arch, ev(e1), e
 def cycleEdge(rel, x, y): return Bool("Cycle:%s_(%s,%s)" %(rel, ev(x), ev(y)))
 
 ### Bool variable to encode the nodes (events) of the cycle
-def cycleVar(x): return Bool("Cycle(%s)" %(ev(x)))
+def cycleVar(rel, x): return Bool("Cycle(%s)(%s)" %(ev(x), rel))
 
 def encodeALO(l):
     """ Encodes that AT LEAST ONE element in the list can be true. """
@@ -141,22 +141,22 @@ class Program:
                 f.write ('\te%s [label="E%s\n%s"];\n' % (e.eid, e.eid, e))
     	    f.write("\t}\n")
     	for e1 in self.storeEvents() + self.initEvents():
-    	    ## Finds and writes the transitive reduction of WS using the schedule imposed by wsVar
+    	    ## Finds and writes the transitive reduction of CO using the schedule imposed by coVar
     	    wEventsLoc = filter(lambda e : e.loc == e1.loc, self.storeEvents() + self.initEvents())
     	    for e2 in wEventsLoc:
-                if int(str(model[intVar('ws', e1)])) == int(str(model[intVar('ws',e2)]))-1:
-                    f.write ('\te%d -> e%d [label="ws", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
-        for e1 in events:
-            if isinstance(e1, Init): continue
-            sameProcEvents = filter(lambda e: e.thread == e1.thread, events)
-            for e2 in sameProcEvents:
-                if isinstance(e2, Init): continue
-                if isinstance(e1, Init) or isinstance(e2, Init): continue
-                if int(str(model[intVar('apoS',e1)])) == int(str(model[intVar('apoS', e2)])) - 1:
-                    if is_true(model[edge('ppoW', e1, e2)]) and is_true(model[edge('ppoS', e1, e2)]):
-                        f.write ('\te%s -> e%s [label="po", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
-                    elif is_true(model[edge('ppoS', e1, e2)]):
-                        f.write ('\te%s -> e%s [label="po", style=dashed, color=\"red\", fontcolor=\"red\"];\n' % (e1.eid, e2.eid))
+                if int(str(model[intVar('co', e1)])) == int(str(model[intVar('co',e2)]))-1:
+                    f.write ('\te%d -> e%d [label="co", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
+#        for e1 in events:
+#            if isinstance(e1, Init): continue
+#            sameProcEvents = filter(lambda e: e.thread == e1.thread, events)
+#            for e2 in sameProcEvents:
+#                if isinstance(e2, Init): continue
+#                if isinstance(e1, Init) or isinstance(e2, Init): continue
+#                if int(str(model[intVar('apoS',e1)])) == int(str(model[intVar('apoS', e2)])) - 1:
+#                    if is_true(model[edge('ppoW', e1, e2)]) and is_true(model[edge('ppoS', e1, e2)]):
+#                        f.write ('\te%s -> e%s [label="po", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
+#                    elif is_true(model[edge('ppoS', e1, e2)]):
+#                        f.write ('\te%s -> e%s [label="po", style=dashed, color=\"red\", fontcolor=\"red\"];\n' % (e1.eid, e2.eid))
         for m in model:
             if any (string in str(m) for string in ["rf(", "fr("]) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";"]):
                 (e1, e2, rel) = getEdge(m)
@@ -165,7 +165,7 @@ class Program:
                 (e1, e2, rel) = getEdge(m)
                 f.write ('\te%s -> e%s [label="%s", color=\"blue\", fontcolor=\"blue\"];\n' % (e1, e2, rel))
             if is_true(model[m]) and all(string in str(m) for string in ["Cycle:","(",")"]):
-		(e1, e2, rel) = getEdge(m, True)
+                (e1, e2, rel) = getEdge(m, True)
                 f.write ('\te%s -> e%s [style=bold, color=green];\n' % (e1, e2))
         f.write ('}')
      	f.close()

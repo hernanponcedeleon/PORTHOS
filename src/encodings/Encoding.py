@@ -224,7 +224,7 @@ def satEmpty(rel, events):
         enc = And(enc, Not(edge(rel,e1,e2)))
     return enc
 
-def satCycle(rel, events):
+def satCycleDef(rel, events):
     enc = True
     for e1 in events:
         source, target = [], []
@@ -232,11 +232,13 @@ def satCycle(rel, events):
             source.append(cycleEdge(rel,e1,e2))
             target.append(cycleEdge(rel,e2,e1))
             enc = And(enc, Implies(cycleEdge(rel,e1,e2), edge(rel,e1,e2)))
-            enc = And(enc, Implies(cycleEdge(rel,e1,e2), And(cycleVar(e1), cycleVar(e2))))
-        enc = And(enc, Implies(cycleVar(e1), encodeALO(source)))
-        enc = And(enc, Implies(cycleVar(e1),encodeALO(target)))
-    enc = And(enc, Or([cycleVar(e) for e in events]))
+            enc = And(enc, Implies(cycleEdge(rel,e1,e2), And(cycleVar(rel, e1), cycleVar(rel, e2))))
+        enc = And(enc, Implies(cycleVar(rel, e1), encodeALO(source)))
+        enc = And(enc, Implies(cycleVar(rel, e1),encodeALO(target)))
     return enc
+
+def satCycle(rel, events):
+    return Or([cycleVar(rel, e) for e in events])
 
 def satTransFixPoint(rel, events):
     enc = True

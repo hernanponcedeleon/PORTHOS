@@ -30,4 +30,6 @@ def TsoConsistent(m):
 def TsoInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     
-    return Or(satCycle('(poloc+com)', events), satCycle('ghb-tso', events))
+    enc = And(satCycleDef('(poloc+com)', events), satCycleDef('ghb-tso', events))
+    enc = And(enc, Or(satCycle('(poloc+com)', events), satCycle('ghb-tso', events)))
+    return enc

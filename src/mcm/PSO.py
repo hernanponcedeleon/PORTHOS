@@ -30,4 +30,6 @@ def PsoConsistent(m):
 def PsoInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     
-    return Or(satCycle('(poloc+com)', events), satCycle('ghb-pso', events))
+    enc = And(satCycleDef('(poloc+com)', events), satCycleDef('ghb-pso', events))
+    enc = And(enc, Or(satCycle('(poloc+com)', events), satCycle('ghb-pso', events)))
+    return enc

@@ -20,4 +20,6 @@ def ScConsistent(m):
 def ScInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     
-    return satCycle('ghb-sc', events)
+    enc = And(satCycleDef('ghb-sc', events))
+    enc = And(enc, satCycle('ghb-sc', events))
+    return enc
