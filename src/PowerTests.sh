@@ -1,2 +1,2 @@
 #!/bin/sh
-for file in ../litmus/*.litmus; do echo $file; ./porthos.py -s tso -t power -i $file; done
+for file in ../litmus/*.litmus; do echo $file; ./porthos.py -s pso -t power -i $file; done
