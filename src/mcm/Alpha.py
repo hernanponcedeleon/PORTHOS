@@ -49,6 +49,6 @@ def AlphaConsistent(m):
 def AlphaInconsistent(m):
     events = [e for e in m.events() if isinstance(e, (Load, Store, Init))]
     
-    enc = And(satCycleDef('(poloc+com)', events), satCycleDef('(dp-alpha+rf)', events), satCycleDef('ghb-tso', events))
-    enc = And(enc, Or(satCycle('(poloc+com)', events), satCycle('(dp-alpha+rf)', events), satCycle('ghb-tso', events)))
+    enc = And(satCycleDef('(poloc+com)', events), satCycleDef('(dp-alpha+rf)', events), satCycleDef('ghb-alpha', events))
+    enc = And(enc, Or(satCycle('(poloc+com)', events), satCycle('(dp-alpha+rf)', events), satCycle('ghb-alpha', events)))
     return enc

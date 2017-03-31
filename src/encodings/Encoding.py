@@ -85,6 +85,8 @@ def encodeDomain(m):
             else:
                 enc = And(enc, Not(edge('po',e1,e2)))
                 enc = And(enc, Not(edge('ctrl',e1,e2)))
+            if not(isinstance(e1, Load) and isinstance(e2, Store) and e1.pid < e2.pid):
+                enc = And(enc, Not(edge('data',e1,e2)))
             if not isinstance(e1, Init) and isinstance(e2, Store) and e1.pid == (e2.pid - 1):
                 lastMod = e2.getMapLastMod()[e2.reg]
                 if e1.reg not in lastMod:
@@ -100,7 +102,7 @@ def encodeDomain(m):
             enc = And(enc, Not(edge('int',e1,e2)))
             enc = And(enc, edge('ext',e1,e2))
             enc = And(enc, Not(edge('po',e1,e2)))
-            #            enc = And(enc, Not(edge('data',e1,e2)))
+            enc = And(enc, Not(edge('data',e1,e2)))
             enc = And(enc, Not(edge('ctrl',e1,e2)))
         if e1.loc == e2.loc:
             enc = And(enc, edge('loc',e1,e2))
@@ -351,18 +353,17 @@ def satFRInit(events):
 def satDomRanIncl(r1, r2, events):
     enc = True
     for e1 in events:
-        orClause1 = Or([edge(r1,e1,e2) for e2 in events])
-        orClause2 = Or([edge(r2,e2,e1) for e2 in events])
-        enc = And(enc, Implies(orClause1, orClause2))
+        enc = And(enc, Implies(Or([edge(r1,e1,e2) for e2 in events]), Or([edge(r2,e3,e1) for e3 in events])))
     return enc
    
 def satRefClos(r, events):
     enc = True
-    for e in events:
-        enc = And(enc, edge('(%s)?' %r,e,e))
+                               #    for e in events:
+                               #        enc = And(enc, edge('(%s)?' %r,e,e))
     for e1, e2 in product(events, events):
-        enc = And(enc, Implies(edge(r,e1,e2), edge('(%s)?' %r,e1,e2)))
-        enc = And(enc, Implies(edge('(%s)?' %r,e1,e2), Or(edge(r,e1,e2), edge('id',e1,e2))))
+                               #        enc = And(enc, Implies(edge(r,e1,e2), edge('(%s)?' %r,e1,e2)))
+                               #        enc = And(enc, Implies(edge('(%s)?' %r,e1,e2), Or(edge(r,e1,e2), edge('id',e1,e2))))
+        enc = And(enc, edge('(%s)?' %r,e1,e2) == Or(edge(r,e1,e2), edge('id',e1,e2)))
     return enc
 
 def satIncl(r1, r2, events):
