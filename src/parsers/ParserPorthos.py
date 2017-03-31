@@ -31,7 +31,7 @@ Lfence = Literal('lfence')
 Hfence = Literal('hfence')
 Cfence = Literal('cfence')
 Fence = Lfence | Hfence | Cfence
-Com = Local | Load | Store | Fence | Read | Write
+Com = Read | Write | Local | Load | Store | Fence
 
 BoolExpr = Forward()
 BoolAtom = Literal('True') | Literal('False') | Literal('true') | Literal('false') | ArithComp | Group(lpar + BoolExpr + rpar)
@@ -104,15 +104,14 @@ def parsedToThread(x, locs, regs):
         atomic = x[2]
         return (pp.Write(loc, reg, atomic), regs)
     elif isinstance(x, ParseResults) and len(x) > 3 and x[3] == "load":
-        if x[2] in regs.keys(): raise Exception('Left-hand side of \"%s\" must be a global variable, \"%s\" is used as a register' %(''.join(x), x[2]))
-        if not x[2] in locs.keys(): raise Exception('Global variable \"%s\" must be declared' %x[2])
-        if x[0] in locs.keys(): raise Exception('Right-hand side of \"%s\" must be a register, \"%s\" is declared as global variable' %(''.join(x), x[0]))
-        if not x[0] in regs.keys(): raise Exception('Local variable \"%s\" must be initialized before using it in an assignement' %x[0])
+        if x[0] in locs.keys(): raise Exception('Left-hand side of \"%s\2 must be a register, \"%s\" is declared as global variable' %(''.join(x), x[0]))
+        if not x[0] in regs.keys(): regs[x[0]] = pp.Register(x[0])
+        if x[2] in regs.keys(): raise Exception('Error: \"%s\" is used as a global variable and a register' %(''.join(x), x[2]))
         if x[4] not in ["na", "rx", "con", "acq", "sc"]: raise Exception('Atomic reads must be non-atomic, relaxed, consume, acquire or sequential_consstent, \"%s\" used instead' %x[2])
-        loc = locs[x[2]]
         reg = regs[x[0]]
+        loc = locs[x[2]]
         atomic = x[4]
-        return (pp.Read(loc, reg, atomic), regs)
+        return (pp.Read(reg, loc, atomic), regs)
     elif isinstance(x, ParseResults) and len(x) > 2 and x[1] == "=":
         if x[0] in regs.keys(): raise Exception('Right-hand side of \"%s\" must be a global variable, \"%s\" is used as a register' %(''.join(x), x[0]))
         if not x[0] in locs.keys(): raise Exception('Global variable \"%s\" must be declared' %x[0])
