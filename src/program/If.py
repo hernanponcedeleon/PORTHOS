@@ -49,9 +49,9 @@ class If(Thread):
         x = self.t2.setEventsID(x)
         return x
 
-    def unroll(self, bound):
-        self.t1 = self.t1.unroll(bound)
-        self.t2 = self.t2.unroll(bound)
+    def compileTo(self, bound, arch):
+        self.t1 = self.t1.compileTo(bound, arch)
+        self.t2 = self.t2.compileTo(bound, arch)
         return self
 
     def setMapLastMod(self, mapping={}):

@@ -25,9 +25,6 @@ class Event(Thread):
         self.eid = x
         return x + 1
 
-    def unroll(self, bound):
-        return self
-
     def setCondReg(self, regs):
         self.condReg = regs
         return self

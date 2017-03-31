@@ -16,9 +16,6 @@ class Thread:
     ### We do not assign the whole thread, but its pid
     def setThread(self, t):
         self.thread = t.pid
-#        if isinstance(self, (pp.If, Seq)):
-#            self.t1.setThread(t)
-#            self.t2.setThread(t)
-#        for e in getEvents(self):
-#            e.thread = self.pid
         return self
+
+    def compileTo(self, bound, arch): return self

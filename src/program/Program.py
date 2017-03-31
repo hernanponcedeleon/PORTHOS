@@ -20,6 +20,8 @@ from Skip import *
 from Store import *
 from Thread import *
 from While import *
+from Write import *
+from Read import *
 
 def intVar(name, e): return Int('%s(%s)' %(name, ev(e)))
 
@@ -81,14 +83,14 @@ class Program:
             eid = t.setEventsID(eid)
         return self
 
-    def initialize(self, bound=1):
+    def initialize(self, arch, bound=1):
         #### add initialization of regs
         """ It initializes a multi-threaded program by setting locations to 0, adding IDs to threads and events and setting threads for events and registers. """
-        unrolledThreads = list()
+        compiledThreads = list()
         for t in self.threads:
-            newT = t.unroll(bound)
-            unrolledThreads.append(newT)
-        self.threads = unrolledThreads
+            newT = t.compileTo(bound, arch)
+            compiledThreads.append(newT)
+        self.threads = compiledThreads
         ### It adds events initializing the locations to 0
         locs = set([x.loc for x in filter(lambda e: isinstance(e, (Load, Store)), self.events())])
         for l in locs:

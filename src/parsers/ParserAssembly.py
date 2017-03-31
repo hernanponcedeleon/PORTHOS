@@ -243,5 +243,5 @@ def parseLitmus(filename):
                     registers[x] = reg
                 thread = Seq(Local(reg, Expression(int(init[t][x]))), thread)
         prog.add(thread)
-    prog.initialize()
+    prog.initialize("sc")
     return prog

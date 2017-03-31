@@ -42,7 +42,7 @@ class While(Thread):
         x = self.t1.setEventsID(x)
         return x
 
-    def unroll(self, bound):
+    def compileTo(self, bound, arch):
         if bound == 0:
             cLevel = self.condLevel
             self = Skip()
@@ -51,9 +51,9 @@ class While(Thread):
         else:
             t = deepcopy(self.t1)
             t.decCondLevel()
-            t = t.unroll(bound)
+            t = t.compileTo(bound, arch)
             cLevel = self.condLevel
-            self = If(self.pred, Seq(t, self.unroll(bound - 1)), Skip())
+            self = If(self.pred, Seq(t, self.compileTo(bound -1 , arch)), Skip())
             ### The if inherits the conLevel of the While
             self.condLevel = cLevel
         return self

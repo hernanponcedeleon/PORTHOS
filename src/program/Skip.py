@@ -30,9 +30,6 @@ class Skip(Thread):
         ### Since it dos not have sub-threads and it is not an event, it does nothing
         return x
 
-    def unroll(self, bound):
-        return self
-
     def setMapLastMod(self, mapping): return mapping
 
     def setCondReg(self, regs): return self
