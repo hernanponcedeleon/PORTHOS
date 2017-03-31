@@ -9,6 +9,7 @@ class Load(Event):
         self.loc = loc
         self.pid = None
         self.eid = None
+        self.z3id = None
         self.thread = None
         self.condLevel = 0
         self.SAreg = None
@@ -17,7 +18,7 @@ class Load(Event):
         self.condReg = None
 
     def __str__(self):
-        return "%s%s <- %s" % ("  "*self.condLevel, str(self.reg), str(self.loc))
+        return "%s%s <- %s" % ("  "*self.condLevel, self.reg, self.loc)
 
     def __repr__(self):
         return "E%s" % str(self.eid)

@@ -8,6 +8,7 @@ class Store(Event):
         self.reg = reg
         self.pid = None
         self.eid = None
+        self.z3id = None
         self.thread = None
         self.condLevel = 0
         self.SALoc = None
@@ -16,7 +17,7 @@ class Store(Event):
         self.condReg = None
 
     def __str__(self):
-        return "%s%s = %s" % ("  "*self.condLevel, str(self.loc), str(self.reg))
+        return "%s%s = %s" % ("  "*self.condLevel, self.loc, self.reg)
 
     def __repr__(self):
         return "E%s" % str(self.eid)

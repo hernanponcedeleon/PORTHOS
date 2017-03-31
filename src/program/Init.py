@@ -7,6 +7,7 @@ class Init(Event):
         self.loc = loc
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         ### When the dataflow is encoded, we save the variable numbering for future uses, for example to encode
         ### that if a load read-from a store, then the values of the locations coincide

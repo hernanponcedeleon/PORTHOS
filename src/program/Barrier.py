@@ -5,6 +5,7 @@ class Barrier(Event):
     def __init__(self):
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
         self.mapLastMod = {}
@@ -24,6 +25,7 @@ class Mfence(Barrier):
     def __init__(self):
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
 
@@ -35,6 +37,7 @@ class Sync(Barrier):
     def __init__(self):
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
 
@@ -46,6 +49,7 @@ class Lwsync(Barrier):
     def __init__(self):
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
 
@@ -57,6 +61,7 @@ class Isync(Barrier):
     def __init__(self):
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
 

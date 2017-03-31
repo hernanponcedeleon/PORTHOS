@@ -8,6 +8,7 @@ class Local(Event):
         self.exp = exp
         self.pid = None
         self.eid = None
+        self.z3id = id(self)
         self.thread = None
         self.condLevel = 0
         self.SAreg = None
@@ -16,7 +17,7 @@ class Local(Event):
         self.condReg = None
 
     def __str__(self):
-        return "%s%s <- %s" % ("  "*self.condLevel, str(self.reg), str(self.exp))
+        return "%s%s <- %s" % ("  "*self.condLevel, self.reg, self.exp)
 
     def __repr__(self):
         return "E%s" % str(self.eid)

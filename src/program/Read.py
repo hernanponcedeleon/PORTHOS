@@ -19,7 +19,7 @@ class Read(Event):
 
     def atomicToLowLevel(self, arch, compiler="llvm"):
         ld = Load(self.reg, self.loc)
-        ld.hlref = self.eid
+        ld.z3id = self.eid
         if compiler != "llvm":
             raise Exception ('Compiler %s is not supported' %compiler)
         if arch in ["sc", "tso", "pso", "rmo", "alpha"]:

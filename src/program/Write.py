@@ -19,7 +19,7 @@ class Write(Event):
 
     def atomicToLowLevel(self, arch, compiler="llvm"):
         st = Store(self.loc, self.reg)
-        st.hlref = self.eid
+        st.z3id = self.eid
         if compiler != "llvm":
             raise Exception ('Compiler %s is not supported' %compiler)
         if arch in ["sc", "tso", "pso", "rmo", "alpha"]:
