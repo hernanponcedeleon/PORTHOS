@@ -1,0 +1,17 @@
+{cond, parkCounter}
+
+thread 0 {
+c = cond.load(rx);
+while (c == 0) {
+  counter = parkCounter.load(rx);
+  a <- 0;
+  parkCounter.store(rx,a);
+  c = cond.load(rx)
+}
+}
+
+thread 1 {
+b <- 1;
+cond.store(rx,b);
+parkCounter.store(rx,b)
+}

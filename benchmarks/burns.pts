@@ -1,0 +1,31 @@
+{x, y}
+
+thread 0 {
+while True {
+  a <- 1;
+  x.store(rx,a);
+  chk = y.load(rx);
+  while (chk != 0) {
+    chk = y.load(rx)
+  };
+  a <- 0;
+  x.store(rx,a)
+}}
+
+thread 1 {
+while True {
+  chk = x.load(rx);
+  while (chk != 0) {
+    chk = x.load(rx)
+  };
+  b <- 1;
+  y.store(rx,b);
+  chk = x.load(rx);
+  b <- 0;
+  if (chk == 0) {
+      y.store(rx,b)
+  }
+  else {
+      y.store(rx,b)
+  }
+}}

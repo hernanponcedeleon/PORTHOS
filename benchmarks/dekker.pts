@@ -1,0 +1,45 @@
+{flag0, flag1, turn}
+
+thread 0 {
+while true {
+  a <- 1;
+  b <- 0;
+  flag0.store(rx,a);
+  f1 = flag1.load(rx);
+  while (f1 == 1) {
+    t1 = turn.load(rx);
+    if (t1 != 0) {
+      flag0.store(rx,b);
+      t1 = turn.load(rx);
+      while (t1 != 0) {
+        t1 = turn.load(rx)
+      };
+      flag0.store(rx,a)
+    }
+  };
+  turn.store(rx,a);
+  flag0.store(rx,b)
+}
+}
+
+thread 1 {
+while true {
+  c <- 1;
+  d <- 0;
+  flag1.store(rx,c);
+  f2 = flag0.load(rx);
+  while (f2 == 1) {
+    t2 = turn.load(rx);
+    if (t2 != 0) {
+      flag1.store(rx,d);
+      t2 = turn.load(rx);
+      while (t2 != 0) {
+        t2 = turn.load(rx)
+      };
+      flag1.store(rx,c)
+    }
+  };
+  turn.store(rx,c);
+  flag1.store(rx,d)
+}
+}
