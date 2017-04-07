@@ -13,10 +13,10 @@ while (y1 != i) {
   y.store(sc,i);
   x1 = x.load(sc);
   if (x1 == i) {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
   else {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
 };
 a <- 0;
@@ -36,10 +36,10 @@ while (y1 != i) {
   y.store(sc,i);
   x1 = x.load(sc);
   if (x1 == i) {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
   else {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
 };
 a <- 0;
@@ -59,10 +59,10 @@ while (y1 != i) {
   y.store(sc,i);
   x1 = x.load(sc);
   if (x1 == i) {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
   else {
-    y1 = y.load(rx)
+    y1 = y.load(sc)
   }
 };
 a <- 0;
