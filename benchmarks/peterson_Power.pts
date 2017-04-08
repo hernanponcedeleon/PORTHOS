@@ -1,0 +1,30 @@
+{flag1, flag2, turn}
+
+thread 0 {
+a <- 1;
+flag2.store(rx,a);
+turn.store(sc,a);
+f1 = flag1.load(sc);
+t1 = turn.load(acq);
+while ((f1 == 1) and (t1 == 1)) {
+  f1 = flag1.load(acq);
+  t1 = turn.load(rx)
+};
+b <- 0;
+flag2.store(rx,b)
+}
+
+thread 1 {
+c <- 1;
+flag1.store(rx,c);
+turn.store(sc,c);
+f2 = flag2.load(sc);
+t2 = turn.load(acq);
+while ((f2 == 1) and (t2 == 1)) {
+  f2 = flag2.load(acq);
+  t2 = turn.load(rx)
+};
+d <- 0;
+flag1.store(rx,d)
+}
+

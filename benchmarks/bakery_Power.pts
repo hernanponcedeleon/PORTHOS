@@ -1,0 +1,45 @@
+{c0, c1, n0, n1}
+
+thread 0 {
+while True {
+  a0 <- 1;
+  c0.store(sc,a0);
+  r0 = n1.load(sc);
+  r1 <- (r0 + 1);
+  n0.store(rx,r1);
+  a1 <- 0;
+  c0.store(sc,a1);
+  chk = c1.load(sc);
+  while (chk != 0) {
+    chk = c1.load(acq)
+  };
+  r0 = n1.load(acq);
+  while ((r0 != 0) and (r0 < r1)) {
+    r0 = n1.load(rx)
+  };
+  a2 <- 0;
+  n0.store(rx,a2)
+}
+}
+
+thread 1 {
+while True {
+  b0 <- 1;
+  c1.store(sc,b0);
+  q0 = n0.load(sc);
+  q1 <- (q0 + 1);
+  n1.store(rx,q1);
+  b1 <- 0;
+  c1.store(sc,b1);
+  chk = c0.load(sc);
+  while (chk != 0) {
+    chk = c0.load(rx)
+  };
+  q0 = n1.load(rx);
+  while ((q0 != 0) and (q0 < q1)) {
+    q0 = n1.load(rx)
+  };
+  b2 <- 0;
+  c0.store(rx,b2)
+}
+}
