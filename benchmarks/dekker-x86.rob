@@ -1,0 +1,37 @@
+Thread 0
+While (True)
+  a <- 1;
+  b <- 0;
+  flag[0] := a;
+  mfence;
+  f1 <- flag[1];
+  While (f1 == 1)
+    t1 <- turn;
+    if (t1 != 0)
+      flag[0] := b;
+      mfence;
+      t1 <- turn;
+      While (t1 != 0)
+        t1 <- turn;
+      flag[0] := a;
+  turn := a;
+  flag[0] := b
+
+Thread 1
+While (True)
+  c <- 1;
+  d <- 0;
+  flag[1] := c;
+  mfence;
+  f2 <- flag[0];
+  While (f2 == 1)
+    t2 <- turn;
+    if (t2 != 0)
+      flag[1] := d;
+      mfence;
+      t2 <- turn;
+      While (t2 != 0)
+        t2 <- turn;
+      flag[1] := c;
+  turn := c;
+  flag[1] := d

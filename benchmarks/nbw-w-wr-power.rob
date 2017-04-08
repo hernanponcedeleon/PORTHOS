@@ -1,0 +1,32 @@
+Thread 0
+cnt <- CCF;
+a0 <- (cnt + 1);
+CCF := a0;
+sync;
+a1 <- 666;
+BUFF := a1;
+sync;
+a2 <- (cnt + 2);
+CCF := a2
+
+Thread 1
+cnt <- CCF;
+b0 <- (cnt + 1);
+CCF := b0;
+sync;
+b1 <- 666;
+BUFF := b1;
+sync;
+b2 <- (cnt + 2);
+CCF := b2;
+sync;
+cnt_b <- CCF;
+lwsync;
+value <- BUFF;
+lwsync;
+cnt_e <- CCF;
+While (cnt_b != cnt_e or (cnt_b % 2) == 1)
+  cnt_b <- CCF;
+  lwsync;
+  value <- BUFF;
+  cnt_e <- CCF

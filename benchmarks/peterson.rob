@@ -1,0 +1,23 @@
+Thread 0
+a <- 1;
+flag2 := a;
+turn := a;
+f1 <- flag1;
+t1 <- turn;
+While (f2 == 1 and t2 == 1)
+  f1 <- flag1;
+  t1 <- turn;
+b <- 0;
+flag2 := b
+
+Thread 1
+c <- 1;
+flag1 := c;
+turn := c;
+f2 <- flag2;
+t2 <- turn;
+While (f1 == 1 and t1 == 1)
+  f2 <- flag2;
+  t2 <- turn;
+d <- 0;
+flag1 := d

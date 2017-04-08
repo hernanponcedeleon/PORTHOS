@@ -1,0 +1,14 @@
+Thread 0
+c <- cond;
+While (c == 0)
+  counter <- park_counter;
+  a <- 0;
+  park_counter := a;
+  mfence;
+  c <- cond
+
+Thread 1
+b <- 1;
+cond := b;
+mfence;
+park_counter := b

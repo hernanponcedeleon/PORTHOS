@@ -1,0 +1,30 @@
+Thread 0
+cnt <- CCF;
+a0 <- (cnt + 1);
+CCF := a0;
+a1 <- 666;
+BUFF := a1;
+a2 <- (cnt + 2);
+CCF := a2
+
+Thread 1
+b <- 888;
+Z := b;
+cnt_b <- CCF;
+value <- BUFF;
+cnt_e <- CCF;
+While (cnt_b != cnt_e or (cnt_b % 2) == 1)
+  cnt_b <- CCF;
+  value <- BUFF;
+  cnt_e <- CCF
+
+Thread 2
+cnt_b <- CCF;
+value <- BUFF;
+cnt_e <- CCF;
+While (cnt_b != cnt_e or (cnt_b % 2) == 1)
+  cnt_b <- CCF;
+  value <- BUFF;
+  cnt_e <- CCF;
+c <- 777;
+Z := c
