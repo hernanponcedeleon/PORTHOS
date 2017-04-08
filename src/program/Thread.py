@@ -18,4 +18,4 @@ class Thread:
         self.thread = t.pid
         return self
 
-    def compileTo(self, bound, arch): return self
+    def compileTo(self, bound): return self
