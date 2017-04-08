@@ -83,12 +83,12 @@ class Program:
             eid = t.setEventsID(eid)
         return self
 
-    def initialize(self, arch, bound=1):
+    def initialize(self, arch="sc", bound=1):
         #### add initialization of regs
         """ It initializes a multi-threaded program by setting locations to 0, adding IDs to threads and events and setting threads for events and registers. """
         compiledThreads = list()
         for t in self.threads:
-            newT = t.compileTo(bound, arch)
+            newT = t.compileTo(bound)
             compiledThreads.append(newT)
         self.threads = compiledThreads
         ### It adds events initializing the locations to 0
@@ -146,19 +146,10 @@ class Program:
     	    ## Finds and writes the transitive reduction of CO using the schedule imposed by coVar
     	    wEventsLoc = filter(lambda e : e.loc == e1.loc, self.storeEvents() + self.initEvents())
     	    for e2 in wEventsLoc:
+                if is_false(model[Bool(ev(e1))]) or is_false(model[Bool(ev(e2))]): continue
                 if int(str(model[intVar('co', e1)])) == int(str(model[intVar('co',e2)]))-1:
                     f.write ('\te%d -> e%d [label="co", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
-#        for e1 in events:
-#            if isinstance(e1, Init): continue
-#            sameProcEvents = filter(lambda e: e.thread == e1.thread, events)
-#            for e2 in sameProcEvents:
-#                if isinstance(e2, Init): continue
-#                if isinstance(e1, Init) or isinstance(e2, Init): continue
-#                if int(str(model[intVar('apoS',e1)])) == int(str(model[intVar('apoS', e2)])) - 1:
-#                    if is_true(model[edge('ppoW', e1, e2)]) and is_true(model[edge('ppoS', e1, e2)]):
-#                        f.write ('\te%s -> e%s [label="po", color=\"black\", fontcolor=\"black\"];\n' % (e1.eid, e2.eid))
-#                    elif is_true(model[edge('ppoS', e1, e2)]):
-#                        f.write ('\te%s -> e%s [label="po", style=dashed, color=\"red\", fontcolor=\"red\"];\n' % (e1.eid, e2.eid))
+
         for m in model:
             if any (string in str(m) for string in ["rf(", "fr("]) and is_true(model[m]) and not any (string in str(m) for string in ["+", ";"]):
                 (e1, e2, rel) = getEdge(m)

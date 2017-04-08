@@ -20,7 +20,7 @@ ArithAtom = Word(digits) | names | Group(lpar + ArithExpr + rpar)
 ArithExpr << ArithAtom + ZeroOrMore(ArithOp + ArithExpr)
 ArithComp = Group(lpar + ArithExpr + CompOp + ArithExpr + rpar)
 
-Atomic = Literal('na') | Literal('sc') | Literal('rx') | Literal('ack') | Literal('rel') | Literal('con')
+Atomic = Literal('na') | Literal('sc') | Literal('rx') | Literal('acq') | Literal('rel') | Literal('con')
 
 Local = Group(names + Literal('<-') + ArithExpr)
 Load = Group(names + Literal('<-') + names)
@@ -98,7 +98,7 @@ def parsedToThread(x, locs, regs):
         if not x[0] in locs.keys(): raise Exception('Global variable \"%s\" must be declared' %x[0])
         if x[3] in locs.keys(): raise Exception('Right-hand side of \"%s\" must be a register, \"%s\" is declared as global variable' %(''.join(x), x[3]))
         if not x[3] in regs.keys(): raise Exception('Local variable \"%s\" must be initialized before using it in an assignement' %x[3])
-        if x[2] not in ["rel", "rx", "sc"]: raise Exception('Atomic writes must be release, relaxed or sequential_consstent, \"%s\" used instead' %x[2])
+        if x[2] not in ["rel", "rx", "sc"]: raise Exception('Atomic writes must be release, relaxed or sequential_consistent, \"%s\" used instead' %x[2])
         loc = locs[x[0]]
         reg = regs[x[3]]
         atomic = x[2]
@@ -107,7 +107,7 @@ def parsedToThread(x, locs, regs):
         if x[0] in locs.keys(): raise Exception('Left-hand side of \"%s\2 must be a register, \"%s\" is declared as global variable' %(''.join(x), x[0]))
         if not x[0] in regs.keys(): regs[x[0]] = pp.Register(x[0])
         if x[2] in regs.keys(): raise Exception('Error: \"%s\" is used as a global variable and a register' %(''.join(x), x[2]))
-        if x[4] not in ["na", "rx", "con", "acq", "sc"]: raise Exception('Atomic reads must be non-atomic, relaxed, consume, acquire or sequential_consstent, \"%s\" used instead' %x[2])
+        if x[4] not in ["na", "rx", "con", "acq", "sc"]: raise Exception('Atomic reads must be non-atomic, relaxed, consume, acquire or sequential_consistent, \"%s\" used instead' %x[2])
         reg = regs[x[0]]
         loc = locs[x[2]]
         atomic = x[4]

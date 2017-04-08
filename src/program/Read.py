@@ -12,21 +12,15 @@ class Read(Event):
         self.condLevel = 0
         self.eid = None
 
-    def __str__(self): return "%s%s = %s.load(%s) -- %s" %("  "*self.condLevel, self.reg, self.loc, self.type, self.eid)
+    def __str__(self): return "%s%s = %s.load(%s)" %("  "*self.condLevel, self.reg, self.loc, self.type)
 
-    def compileTo(self, bound, arch):
-        return self.atomicToLowLevel(arch)
+    def compileTo(self, bound):
+        return self.atomicToLowLevel()
 
-    def atomicToLowLevel(self, arch, compiler="llvm"):
+    def atomicToLowLevel(self):
         ld = Load(self.reg, self.loc)
         ld.z3id = self.eid
-        if compiler != "llvm":
-            raise Exception ('Compiler %s is not supported' %compiler)
-        if arch in ["sc", "tso", "pso", "rmo", "alpha"]:
-            return ld
-        elif arch in ["power", "cav10"]:
-            if self.type == "sc": return Seq(Sync(), Seq(ld, Lwsync()))
-            elif self.type in ["rx", "na"]: return ld
-            elif self.type in ["con", "ack"]: return Seq(ld, Lwsync())
-            else: raise Exception ('Error in the atomic operation type of %s' %self)
-        else: raise Exception ('Error in the architecture %s' %arch)
+        if self.type == "sc": return Seq(Sync(), Seq(ld, Lwsync()))
+        elif self.type in ["rx", "na"]: return ld
+        elif self.type in ["con", "acq"]: return Seq(ld, Lwsync())
+        else: raise Exception ('Error in the atomic operation type of %s' %self)

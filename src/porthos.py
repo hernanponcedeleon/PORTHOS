@@ -65,7 +65,7 @@ def main(argv):
     if verbose:
         print program
 
-    print "Checking portability between %s and %s" %(bcolors.OKBLUE + source + bcolors.ENDC, bcolors.OKBLUE + target + bcolors.ENDC)
+    print "Checking portability between %s and %s %s" %(bcolors.OKBLUE + source + bcolors.ENDC, bcolors.OKBLUE + target + bcolors.ENDC, "with deadness" if dead else "")
 
     (sol, model) = portability(program, source, target, dead)
 
