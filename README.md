@@ -21,7 +21,6 @@ where \<input> must be a .litmus or .pts (see below) program and \<source>, \<ta
 - rmo
 - alpha
 - power
-- cav10
 
 The optional -o and flags produces a .dot file showing the basic relations **rf**, **co** and **fr**. Additional relations can be displayed in the graph using --print=r1,r2,...,rn.
 
