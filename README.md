@@ -1,6 +1,6 @@
 # PORTHOS: _One_ Tool _for all_ Models
 
-![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS/blob/master/extras/porthos_small.jpg)
+![myimage-alt-tag](https://github.com/hernanponcedeleon/PORTHOS_v0.1/blob/master/extras/porthos_small.jpg)
 
 Requirements
 ======
